@@ -1,0 +1,15 @@
+body.light {
+	--bg-main: #efefef;
+	--bg-app: #f2f2f2;
+
+	--txt-1: #111;
+	--txt-2: #222;
+	--txt-3: #ccc;
+
+	--project-txt: #333;
+	--project-bg: none;
+	--project-hover-txt: #111;
+	--project-hover-bg: #e5e5e5;
+	--project-active-txt: #111;
+	--project-active-bg: #dadada;
+}
