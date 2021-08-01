@@ -5,6 +5,8 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
     description = tooltip.querySelector<HTMLParagraphElement>('p')!,
     stack = tooltip.querySelector<HTMLDivElement>('div.stack')!,
+    source = tooltip.querySelector<HTMLAnchorElement>('a.source')!,
+    preview = tooltip.querySelector<HTMLAnchorElement>('a.preview')!,
     closeButton = tooltip.querySelector<HTMLButtonElement>('.close-tooltip')!,
     duration = 200;
 
@@ -35,10 +37,11 @@ export const displayProject = (a: HTMLAnchorElement) => {
  */
 const assignProjectToTooltip = (project: Project) => {
     title.innerText = project.title;
-    description.innerText = project.description;
+    description.innerText = project.description
+    source.href = project.repo;
+    preview.href = project.url;
 
     stack.innerHTML = '';
-
     for (const t of project.stack) {
         const tech = getTech(t)
         if (!tech) continue;

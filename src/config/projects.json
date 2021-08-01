@@ -1,35 +1,35 @@
 [
 	{
 		"title": "animate-canvas",
-		"url": "#",
+		"url": "https://github.com/felixgro/canvas-animator",
 		"repo": "https://github.com/felixgro/canvas-animator",
 		"description": "A minimal utility class for frame-independent Canvas2D animations.",
 		"stack": ["ts"]
 	},
 	{
 		"title": "vec2",
-		"url": "#",
+		"url": "https://github.com/felixgro/vec2",
 		"repo": "https://github.com/felixgro/vec2",
 		"description": "An intuitive, lightweight 2d vector library with built-in canvas support.",
 		"stack": ["ts"]
 	},
 	{
 		"title": "boids-simulation",
-		"url": "#",
+		"url": "https://boids-simulation.vercel.app/",
 		"repo": "https://github.com/felixgro/boids-simulation",
 		"description": "Implementation of Craig Reynold's Boids Algorithm featuring reproduction & predetors along with an instinctive UI to tweak relevant proterties.",
 		"stack": ["ts"]
 	},
 	{
 		"title": "fractal-visualizer",
-		"url": "#",
+		"url": "https://fractal-visualizer.netlify.app/",
 		"repo": "https://github.com/felixgro/fractal-visualizer",
 		"description": "This project demonstrates an artistic side of math by generating and redrawing fractals based on user defined variables.",
 		"stack": ["vue"]
 	},
 	{
 		"title": "custcur",
-		"url": "#",
+		"url": "https://github.com/felixgro/custcur",
 		"repo": "https://github.com/felixgro/custcur",
 		"description": "A lightweight, highly customizable cursor event framework for the web.",
 		"stack": ["js"]
