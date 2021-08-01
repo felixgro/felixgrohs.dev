@@ -21,10 +21,10 @@
 		"stack": ["ts"]
 	},
 	{
-		"title": "fractal visualizer",
+		"title": "fractal-visualizer",
 		"url": "#",
 		"repo": "https://github.com/felixgro/fractal-visualizer",
-		"description": "This project should demonstrate an artistic side of math by generating and redrawing fractals based on user defined variables.",
+		"description": "This project demonstrates an artistic side of math by generating and redrawing fractals based on user defined variables.",
 		"stack": ["vue"]
 	},
 	{
