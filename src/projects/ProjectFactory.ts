@@ -61,12 +61,11 @@ export const onProjectClick = (callback: (this: GlobalEventHandlers, ev: MouseEv
  */
 const addProjectsTo = (container: Element): void => {
     for (const project of projects) {
-        const a = document.createElement('a');
-        a.className = 'project-anchor';
-        a.innerText = project.title;
-        a.href = project.url;
-        a.onclick = clickCallback;
+        const p = document.createElement('div');
+        p.className = 'project-anchor';
+        p.innerHTML = project.title;
+        p.onclick = clickCallback;
 
-        container.appendChild(a);
+        container.appendChild(p);
     }
 };
