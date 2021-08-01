@@ -30,7 +30,13 @@
 			display: none;
 		}
 
+		& .sub-container {
+			display: flex;
+			align-items: center;
+		}
+
 		& .project-anchor {
+			position: relative;
 			padding: 11px 15px;
 			box-sizing: border-box;
 			border-radius: 100px;
@@ -38,6 +44,12 @@
 			background: var(--project-bg);
 			white-space: nowrap;
 			transition: all 140ms ease-out;
+			cursor: pointer;
+
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
 
 			&:hover {
 				color: var(--project-hover-txt);
