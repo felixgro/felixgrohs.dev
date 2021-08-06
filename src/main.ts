@@ -1,5 +1,5 @@
 import initProjectScroller from './projects/ProjectScroller';
-import animateGrid, { reDraw } from './utils/grid';
+import animateGrid, { renderGrid } from './utils/grid';
 import { on } from './utils/events';
 
 on('load', () => {
@@ -10,12 +10,5 @@ on('load', () => {
 
     animateGrid(gridCanvas, gridChilds);
 
-    on('resize', reDraw);
-
-
-    // document.onclick = () => {
-    //     document.body.className = 'dark'
-    // }
-
-
+    on('resize', renderGrid);
 });

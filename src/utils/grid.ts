@@ -71,7 +71,7 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
     for (const line of lines) line.draw(ctx);
 }
 
-export const reDraw = () => {
+export const renderGrid = () => {
     canvas.height = canvas.clientHeight;
     canvas.width = canvas.clientWidth;
     canvasBcr = canvas.getBoundingClientRect();
