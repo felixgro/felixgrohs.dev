@@ -15,6 +15,14 @@
 			inset -25px 0px 25px -25px var(--bg-app);
 	}
 
+	& .focus-catch {
+		position: absolute;
+		height: 0;
+		width: 0;
+		overflow: hidden;
+		opacity: 0;
+	}
+
 	& .projects {
 		position: absolute;
 		height: 100%;

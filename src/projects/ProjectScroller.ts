@@ -3,23 +3,26 @@ import { displayProject, closeTooltip } from './ProjectTooltip';
 import { on } from '../utils/events';
 import debounce from '../utils/debounce';
 
-const scrollSpeed = .9,
+const focusCatch = document.querySelector('.focus-catch') as HTMLAnchorElement,
+	scrollSpeed = .9,
 	centeringFactor = .9,
-	debounceTime = 150;
+	clickDebounce = 150;
 
 let currentProject: HTMLAnchorElement | null,
 	parentContainer: HTMLDivElement,
 	firstContainer: HTMLDivElement,
 	lastContainer: HTMLDivElement,
+	subContainers: NodeListOf<Element>,
 	parentBcr: DOMRect,
 	currentScroll = 0,
 	currentFrame = 0,
 	isScrolling = false,
 	isCentering = false,
+	focused = false,
 	margin = window.innerWidth * 1.5;
 
 /**
- * Initialize by filling the parent with all configured projects, assign variables and start auto scrolling.
+ * Initialize by filling parent container with all configured projects, assign variables and start auto scrolling.
  */
 export default () => {
 	parentContainer = document.querySelector('.projects')!;
@@ -30,7 +33,7 @@ export default () => {
 
 		const project = e.target as HTMLAnchorElement;
 		if (project !== currentProject) centerProject(project);
-	}, debounceTime));
+	}, clickDebounce));
 
 	fillParentContainer();
 	firstContainer = parentContainer.firstElementChild as HTMLDivElement;
@@ -49,6 +52,64 @@ export default () => {
 		leading: false,
 		trailing: true
 	}));
+
+
+	// Accessibility for project scroller
+
+	const leftNeighbor = (): HTMLAnchorElement => {
+		const subSection = currentProject!.parentElement!;
+		let neighbor: Element;
+
+		if (subSection.firstElementChild !== currentProject!) {
+			neighbor = currentProject!.previousElementSibling!;
+		} else {
+			neighbor = subSection.previousElementSibling!.lastElementChild!;
+		}
+
+		return neighbor as HTMLAnchorElement;
+	}
+
+	const rightNeighbor = (): HTMLAnchorElement => {
+		const subSection = currentProject!.parentElement!;
+		let neighbor: Element;
+
+		if (subSection.lastElementChild !== currentProject!) {
+			neighbor = currentProject!.nextElementSibling!;
+		} else {
+			neighbor = subSection.nextElementSibling!.firstElementChild!;
+		}
+
+		return neighbor as HTMLAnchorElement;
+	}
+
+	focusCatch.onfocus = (e: Event) => {
+		e.preventDefault();
+
+		focused = true;
+		subContainers = document.querySelectorAll('.sub-container');
+		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLButtonElement).click();
+	};
+
+	on('key-Left', () => {
+		if (!focused) return;
+		leftNeighbor().click();
+	});
+
+	on('key-Right', () => {
+		if (!focused) return;
+		rightNeighbor().click();
+	});
+
+	on('key-Escape', () => {
+		if (!focused) return;
+		focused = false;
+
+		startScrolling();
+		closeTooltip();
+
+		// put focus on following anchor
+		(document.querySelector('footer.main a') as HTMLAnchorElement).focus();
+	});
 }
 
 /**

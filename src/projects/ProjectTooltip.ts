@@ -1,5 +1,6 @@
 import { getProject, getTech, Project } from './ProjectFactory';
 import { startScrolling } from './ProjectScroller';
+import trapFocus, { FocusTrap } from '../utils/trapFocus';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
@@ -10,7 +11,8 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     closeButton = tooltip.querySelector<HTMLButtonElement>('.close-tooltip')!,
     duration = 200;
 
-let bgElement: HTMLDivElement,
+let focusTrap: FocusTrap,
+    bgElement: HTMLDivElement,
     isOpen = false;
 
 /**
@@ -131,6 +133,8 @@ export const openTooltip = () => {
     });
 
     addClickableBackground();
+    focusTrap = trapFocus(tooltip);
+    preview.focus();
 };
 
 /**
@@ -157,6 +161,7 @@ export const closeTooltip = () => {
     setTimeout(() => tooltip.style.display = 'none', duration);
 
     removeClickableBackground();
+    focusTrap.untrap();
     startScrolling();
 };
 
