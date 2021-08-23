@@ -35,7 +35,6 @@ export class FocusTrap {
 
 		for (const element of this.focusElements) {
 			if (hasParent(this.container, element)) {
-				console.log(element);
 				continue;
 			}
 
