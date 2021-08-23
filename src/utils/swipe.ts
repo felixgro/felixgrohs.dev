@@ -1,5 +1,16 @@
 type EventCallback = (e: TouchEvent) => void;
 
+/**
+ * Listen for touch swipe gestures within argument element.
+ * 
+ * Register left, right, up, down event listeners using method chaining:
+ * swipe(...).onLeft = (e) => {}
+ * 
+ * Start/Stop listening using the corresponding methods:
+ * swipe(...).start()  or  swipe(...).stop()
+ * 
+ * @param swipeArea - Area for swipe gestures.
+ */
 export default (swipeArea: HTMLElement) => new Swipe(swipeArea);
 
 export class Swipe {
@@ -15,11 +26,6 @@ export class Swipe {
 
     constructor(el: HTMLElement) {
         this.el = el;
-
-        this.el.ontouchstart = (e: TouchEvent) => {
-            this.xDown = e.touches[0].clientX;
-            this.yDown = e.touches[0].clientY;
-        }
     }
 
     onLeft(callback: EventCallback) {
@@ -59,15 +65,20 @@ export class Swipe {
         this.yDown = null;
     }
 
-    run() {
+    start() {
+        this.el.ontouchstart = (e: TouchEvent) => {
+            this.xDown = e.touches[0].clientX;
+            this.yDown = e.touches[0].clientY;
+        }
+
         this.el.ontouchmove = (e: TouchEvent) => {
             e.preventDefault();
             this.handleTouchMove(e);
         }
     }
 
-    destroy() {
-        this.el.ontouchmove = (e: TouchEvent) => e.preventDefault();
-        this.el.ontouchstart = (e: TouchEvent) => e.preventDefault();
+    stop() {
+        this.el.ontouchstart = null;
+        this.el.ontouchmove = null;
     }
 }

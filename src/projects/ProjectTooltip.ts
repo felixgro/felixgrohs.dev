@@ -1,9 +1,9 @@
 import { getProject, Project } from './ProjectFactory';
 import { startScrolling } from './ProjectScroller';
 import trapFocus, { FocusTrap } from '../utils/trapFocus';
+import swipe, { Swipe } from '../utils/swipe';
 import { on } from '../utils/events';
 import blurAndCall from '../utils/blurAndCall';
-import initSwipe from '../utils/swipe';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
@@ -17,7 +17,8 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     buttonClose = tooltip.querySelector<HTMLButtonElement>('button.touch-close')!,
     duration = 200; // Duration for tooltip animation in ms
 
-let currentProject: HTMLAnchorElement | null,
+let swiper: Swipe,
+    currentProject: HTMLAnchorElement | null,
     focusTrap: FocusTrap,
     bgElement: HTMLDivElement,
     isOpen = false;
@@ -70,13 +71,8 @@ export const openTooltip = () => {
     });
 
     addClickableBackground();
-
+    swiper.start();
     focusTrap = trapFocus(tooltip);
-
-    initSwipe(document.querySelector('.projects')!)
-        .onLeft(gotoNext)
-        .onRight(gotoPrevious)
-        .run();
 };
 
 
@@ -104,6 +100,7 @@ export const closeTooltip = () => {
     setTimeout(() => tooltip.style.display = 'none', duration);
 
     removeClickableBackground();
+    swiper.stop();
     focusTrap.untrap();
     startScrolling();
 };
@@ -280,3 +277,7 @@ on('key-Escape', () => {
     startScrolling();
     closeTooltip();
 });
+
+swiper = swipe(document.querySelector('.projects')!)
+    .onLeft(gotoNext)
+    .onRight(gotoPrevious);
