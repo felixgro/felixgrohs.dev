@@ -1,6 +1,8 @@
 type EventCallback = (e: TouchEvent) => void;
 
-export default class Swipe {
+export default (swipeArea: HTMLElement) => new Swipe(swipeArea);
+
+export class Swipe {
     private el: HTMLElement;
 
     private xDown: number | null = null;

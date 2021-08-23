@@ -3,7 +3,7 @@ import { startScrolling } from './ProjectScroller';
 import trapFocus, { FocusTrap } from '../utils/trapFocus';
 import { on } from '../utils/events';
 import blurAndCall from '../utils/blurAndCall';
-import Swipe from '../utils/swipe';
+import initSwipe from '../utils/swipe';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
@@ -73,7 +73,7 @@ export const openTooltip = () => {
 
     focusTrap = trapFocus(tooltip);
 
-    new Swipe(document.querySelector('.projects')!)
+    initSwipe(document.querySelector('.projects')!)
         .onLeft(gotoNext)
         .onRight(gotoPrevious)
         .run();
