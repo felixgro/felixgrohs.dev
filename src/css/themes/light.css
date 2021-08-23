@@ -1,4 +1,5 @@
 body.light {
+	/* Main Theme */
 	--bg-main: #efefef;
 	--bg-app: #f2f2f2;
 
@@ -6,6 +7,7 @@ body.light {
 	--txt-2: #222;
 	--txt-3: #ccc;
 
+	/* Projects Scroller */
 	--project-txt: #333;
 	--project-bg: none;
 	--project-hover-txt: #111;
@@ -13,12 +15,18 @@ body.light {
 	--project-active-txt: #111;
 	--project-active-bg: #dadada;
 
-	--tooltip-close-path: #4e4e4e;
-	--tooltip-close-hover-path: #ddd;
-	--tooltip-close-bg: none;
-	--tooltip-close-hover-bg: #2e2e2e;
-
+	/* Projects Tooltip */
+	--tooltip-bg: #222;
 	--tooltip-header: #676767;
 	--tooltip-paragraph: #fff;
+	--tooltip-footer-bg: green;
+	--tooltip-footer-border: 1px solid green;
+
+	--tooltip-close-path: #4e4e4e;
+	--tooltip-close-bg: none;
+	--tooltip-close-hover-path: #ddd;
+	--tooltip-close-hover-bg: #2e2e2e;
+
+	/* REMOVE! */
 	--tooltip-hr: #2f2f2f;
 }

@@ -83,7 +83,7 @@
 	max-width: 480px;
 	border-radius: 10px;
 	color: #eee;
-	background: #262626;
+	background: var(--tooltip-bg);
 	transform-origin: bottom center;
 	z-index: 200;
 
