@@ -1,6 +1,6 @@
 const lines: Line[] = [],
     lineWidth = 2,
-    lineColor = '#e1e1e1';
+    lineColor = '#272729';
 
 let canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,

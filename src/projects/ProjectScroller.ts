@@ -18,7 +18,6 @@ let currentProject: HTMLAnchorElement | null,
 	currentFrame = 0,
 	isScrolling = false,
 	isCentering = false,
-	focused = false,
 	margin = window.innerWidth * 1.5;
 
 /**
@@ -38,6 +37,7 @@ export default () => {
 	fillParentContainer();
 	firstContainer = parentContainer.firstElementChild as HTMLDivElement;
 	lastContainer = parentContainer.lastElementChild as HTMLDivElement;
+
 	startScrolling();
 
 	parentContainer.ontouchmove = (e: Event) => e.preventDefault();
@@ -53,82 +53,59 @@ export default () => {
 		trailing: true
 	}));
 
-
 	// Accessibility for project scroller
-
 	focusCatch.onfocus = (e: Event) => {
 		e.preventDefault();
 
-		focused = true;
 		subContainers = document.querySelectorAll('.sub-container');
 		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLButtonElement).click();
 	};
-
-	on('key-Left', () => {
-		if (!focused) return;
-		leftNeighbor().click();
-	});
-
-	on('key-Right', () => {
-		if (!focused) return;
-		rightNeighbor().click();
-	});
-
-	on('key-Escape', () => {
-		if (!focused) return;
-		focused = false;
-
-		startScrolling();
-		closeTooltip();
-
-		// put focus on following anchor
-		(document.querySelector('footer.main a') as HTMLAnchorElement).focus();
-	});
 }
 
-export const leftNeighbor = (): HTMLAnchorElement => {
-	const subSection = currentProject!.parentElement!;
-	let neighbor: Element;
 
-	if (subSection.firstElementChild !== currentProject!) {
-		neighbor = currentProject!.previousElementSibling!;
-	} else {
-		neighbor = subSection.previousElementSibling!.lastElementChild!;
+/**
+ * Starts auto scrolling.
+ */
+export const startScrolling = () => {
+	if (isScrolling) return;
+	if (currentProject) {
+		currentProject.classList.remove('active');
+		currentProject = null;
 	}
-
-	return neighbor as HTMLAnchorElement;
+	isScrolling = true;
+	currentScroll = parentContainer.scrollLeft;
+	currentFrame = window.requestAnimationFrame(scrollAnimationFrame);
 }
 
-export const rightNeighbor = (): HTMLAnchorElement => {
-	const subSection = currentProject!.parentElement!;
-	let neighbor: Element;
 
-	if (subSection.lastElementChild !== currentProject!) {
-		neighbor = currentProject!.nextElementSibling!;
-	} else {
-		neighbor = subSection.nextElementSibling!.firstElementChild!;
-	}
-
-	return neighbor as HTMLAnchorElement;
+/**
+ * Stops auto scrolling.
+ */
+export const stopScrolling = () => {
+	if (!isScrolling) return;
+	isScrolling = false;
+	window.cancelAnimationFrame(currentFrame);
 }
+
 
 /**
 * Appends a new container in parent.
 * 
 * @returns new container
 */
-export const appendContainer = (): HTMLDivElement => {
+const appendContainer = (): HTMLDivElement => {
 	lastContainer = createContainer();
 	parentContainer.appendChild(lastContainer);
 
 	return lastContainer;
 }
 
+
 /**
  * Removes first container from parent.
  * 
  */
-export const shiftContainer = () => {
+const shiftContainer = () => {
 	const width = firstContainer.clientWidth;
 
 	firstContainer.remove();
@@ -138,12 +115,13 @@ export const shiftContainer = () => {
 	parentContainer.scrollLeft = currentScroll;
 }
 
+
 /**
  * Prepends a new container in parent.
  * 
  * @returns new container
  */
-export const prependContainer = (): HTMLDivElement => {
+const prependContainer = (): HTMLDivElement => {
 	firstContainer = createContainer();
 	parentContainer.prepend(firstContainer);
 
@@ -153,13 +131,15 @@ export const prependContainer = (): HTMLDivElement => {
 	return firstContainer;
 }
 
+
 /**
  * Removes last container from parent.
  */
-export const popContainer = () => {
+const popContainer = () => {
 	lastContainer.remove();
 	lastContainer = parentContainer.lastElementChild as HTMLDivElement;
 }
+
 
 /**
  * Animation loop for auto scrolling.
@@ -179,28 +159,6 @@ const scrollAnimationFrame = () => {
 	if (lastBcr.x > currentScroll + margin) popContainer();
 }
 
-/**
- * Starts auto scrolling.
- */
-export const startScrolling = () => {
-	if (isScrolling) return;
-	if (currentProject) {
-		currentProject.classList.remove('active');
-		currentProject = null;
-	}
-	isScrolling = true;
-	currentScroll = parentContainer.scrollLeft;
-	currentFrame = window.requestAnimationFrame(scrollAnimationFrame);
-}
-
-/**
- * Stops auto scrolling.
- */
-export const stopScrolling = () => {
-	if (!isScrolling) return;
-	isScrolling = false;
-	window.cancelAnimationFrame(currentFrame);
-}
 
 /**
  * Fills all available space (including specified margin) within parent using sub-containers and
@@ -218,6 +176,7 @@ const fillParentContainer = () => {
 	currentScroll = margin;
 	parentContainer.scrollLeft = currentScroll;
 }
+
 
 /**
  * Animates horizontal scroll by given amount in pixels.
@@ -250,6 +209,7 @@ const scrollBy = (amount: number) => {
 		}, currTime);
 	});
 }
+
 
 /**
  * Scrolls smoothly through parent container in order to center

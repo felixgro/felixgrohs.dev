@@ -11,22 +11,19 @@ body.light {
 	--project-txt: #333;
 	--project-bg: none;
 	--project-hover-txt: #111;
-	--project-hover-bg: #e5e5e5;
+	--project-hover-bg: #eaeaea;
 	--project-active-txt: #111;
-	--project-active-bg: #dadada;
+	--project-active-bg: #e5e5e5;
 
 	/* Projects Tooltip */
-	--tooltip-bg: #222;
-	--tooltip-header: #676767;
-	--tooltip-paragraph: #fff;
-	--tooltip-footer-bg: green;
+	--tooltip-bg: #e5e5e5;
+	--tooltip-header: #222;
+	--tooltip-paragraph: #000;
+	--tooltip-footer-bg: #dadada;
 	--tooltip-footer-border: 1px solid green;
 
 	--tooltip-close-path: #4e4e4e;
 	--tooltip-close-bg: none;
 	--tooltip-close-hover-path: #ddd;
 	--tooltip-close-hover-bg: #2e2e2e;
-
-	/* REMOVE! */
-	--tooltip-hr: #2f2f2f;
 }

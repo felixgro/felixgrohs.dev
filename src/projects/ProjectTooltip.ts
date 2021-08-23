@@ -1,6 +1,8 @@
-import { getProject, getTech, Project } from './ProjectFactory';
-import { startScrolling, leftNeighbor, rightNeighbor } from './ProjectScroller';
+import { getProject, Project } from './ProjectFactory';
+import { startScrolling } from './ProjectScroller';
 import trapFocus, { FocusTrap } from '../utils/trapFocus';
+import { on } from '../utils/events';
+import blurAndCall from '../utils/blurAndCall';
 import Swipe from '../utils/swipe';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
@@ -9,12 +11,17 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     stack = tooltip.querySelector<HTMLDivElement>('div.stack')!,
     source = tooltip.querySelector<HTMLAnchorElement>('a.source')!,
     preview = tooltip.querySelector<HTMLAnchorElement>('a.preview')!,
-    closeButton = tooltip.querySelector<HTMLButtonElement>('.close-tooltip')!,
-    duration = 200;
+    buttonBackward = tooltip.querySelector<HTMLButtonElement>('button.backward')!,
+    buttonEscape = tooltip.querySelector<HTMLButtonElement>('button.escape')!,
+    buttonForward = tooltip.querySelector<HTMLButtonElement>('button.forward')!,
+    buttonClose = tooltip.querySelector<HTMLButtonElement>('button.touch-close')!,
+    duration = 200; // Duration for tooltip animation in ms
 
-let focusTrap: FocusTrap,
+let currentProject: HTMLAnchorElement | null,
+    focusTrap: FocusTrap,
     bgElement: HTMLDivElement,
     isOpen = false;
+
 
 /**
  * Displays a new project within the tooltip.
@@ -25,88 +32,16 @@ export const displayProject = (a: HTMLAnchorElement) => {
     const project = getProject(a.innerText);
     if (!project) return;
 
+    currentProject = a;
+
     if (isOpen) {
         switchTo(project);
-        preview.focus();
     } else {
         assignProjectToTooltip(project);
         openTooltip();
     }
 };
 
-/**
- * Updates tooltip's data to match the selected project.
- * 
- * @param project
- */
-const assignProjectToTooltip = (project: Project) => {
-    title.innerText = project.title;
-    description.innerText = project.description
-    source.href = project.repo;
-    preview.href = project.url;
-
-    stack.innerHTML = '';
-    for (const t of project.stack) {
-        const tech = getTech(t)
-        if (!tech) continue;
-
-        const badge = document.createElement('div');
-        badge.className = 'badge';
-        badge.innerText = tech.short;
-        badge.style.background = tech.color;
-        stack.appendChild(badge);
-    }
-};
-
-/**
- * Smoothly animate height to fit new project within tooltip.
- * 
- * @param project 
- */
-const switchTo = (project: Project) => {
-    let curHeight = tooltip.clientHeight;
-
-    assignProjectToTooltip(project);
-
-    tooltip.style.height = 'auto';
-    let newHeight = tooltip.getBoundingClientRect().height;
-    tooltip.style.height = `${curHeight}px`;
-
-    tooltip.animate([
-        {
-            height: `${curHeight}px`
-        }, {
-            height: `${newHeight}px`
-        }
-    ], {
-        duration,
-        easing: 'ease-out'
-    });
-
-    tooltip.style.height = `auto`;
-};
-
-/**
- * Adds full width & height background layer which auto closes tooltip on click.
- */
-const addClickableBackground = () => {
-    bgElement = document.createElement('div');
-    Object.assign(bgElement.style, {
-        position: 'fixed',
-        inset: 0,
-        'z-index': 100,
-    });
-
-    bgElement.onclick = closeTooltip;
-    document.body.appendChild(bgElement);
-}
-
-/**
- * Removes background layer.
- */
-const removeClickableBackground = () => {
-    bgElement.remove();
-}
 
 /**
  * Positionates & opens tooltip if it's currently closed.
@@ -135,17 +70,15 @@ export const openTooltip = () => {
     });
 
     addClickableBackground();
+
     focusTrap = trapFocus(tooltip);
-    preview.focus();
 
     new Swipe(document.querySelector('.projects')!)
-        .onLeft(() => {
-            rightNeighbor().click();
-        })
-        .onRight(() => {
-            leftNeighbor().click()
-        }).run();
+        .onLeft(gotoNext)
+        .onRight(gotoPrevious)
+        .run();
 };
+
 
 /**
  * Closes tooltip, and starts autoscrolling afterwards.
@@ -175,4 +108,175 @@ export const closeTooltip = () => {
     startScrolling();
 };
 
-closeButton.onclick = closeTooltip;
+
+/**
+ * Jump to next project.
+ */
+export const gotoNext = () => {
+    if (!isOpen) return;
+
+    const next = getRightNeighbor();
+    if (next) next.click();
+}
+
+
+/**
+ * Jump to previous project.
+ */
+export const gotoPrevious = () => {
+    if (!isOpen) return;
+
+    const prev = getLeftNeighbor();
+    if (prev) prev.click();
+}
+
+
+/**
+ * Get left neighbor of currently selected project.
+ * 
+ * @returns project element
+ */
+export const getLeftNeighbor = (): HTMLAnchorElement | void => {
+    if (!isOpen) return;
+
+    const subSection = currentProject!.parentElement!;
+    let neighbor: Element;
+
+    if (subSection.firstElementChild !== currentProject!) {
+        neighbor = currentProject!.previousElementSibling!;
+    } else {
+        neighbor = subSection.previousElementSibling!.lastElementChild!;
+    }
+
+    return neighbor as HTMLAnchorElement;
+}
+
+
+/**
+ * Get right neighbor of currently selected project.
+ * 
+ * @returns project element
+ */
+export const getRightNeighbor = (): HTMLAnchorElement | void => {
+    if (!isOpen) return;
+
+    const subSection = currentProject!.parentElement!;
+    let neighbor: Element;
+
+    if (subSection.lastElementChild !== currentProject!) {
+        neighbor = currentProject!.nextElementSibling!;
+    } else {
+        neighbor = subSection.nextElementSibling!.firstElementChild!;
+    }
+
+    return neighbor as HTMLAnchorElement;
+}
+
+
+/**
+ * Updates tooltip's data to match the selected project.
+ * 
+ * @param project
+ */
+const assignProjectToTooltip = (project: Project) => {
+    title.innerText = project.title;
+    description.innerText = project.description
+    source.href = project.repo;
+    preview.href = project.url;
+
+    for (let i = 0; i < stack.children.length; i++) {
+        const tech = stack.children[i] as HTMLElement;
+
+        if (project.stack.includes(tech.className)) {
+            // show tech if not visible
+            if (tech.getAttribute('aria-hidden') === 'true') {
+                tech.style.display = 'block';
+                tech.setAttribute('aria-hidden', 'false');
+            }
+        } else {
+            // hide tech if still visible
+            if (tech.getAttribute('aria-hidden') === 'false') {
+                tech.style.display = 'none';
+                tech.setAttribute('aria-hidden', 'true');
+            }
+        }
+    }
+};
+
+
+/**
+ * Smoothly animate height to fit new project within tooltip.
+ * 
+ * @param project 
+ */
+const switchTo = (project: Project) => {
+    const curHeight = tooltip.clientHeight;
+
+    assignProjectToTooltip(project);
+
+    tooltip.style.height = 'auto';
+    let newHeight = tooltip.getBoundingClientRect().height;
+    tooltip.style.height = `${curHeight}px`;
+
+    tooltip.animate([
+        {
+            height: `${curHeight}px`
+        }, {
+            height: `${newHeight}px`
+        }
+    ], {
+        duration,
+        easing: 'ease-out'
+    });
+
+    tooltip.style.height = `auto`;
+};
+
+
+/**
+ * Adds full width & height background layer which auto closes tooltip on click.
+ */
+const addClickableBackground = () => {
+    bgElement = document.createElement('div');
+    Object.assign(bgElement.style, {
+        position: 'fixed',
+        inset: 0,
+        'z-index': 100,
+    });
+
+    bgElement.onclick = closeTooltip;
+    document.body.appendChild(bgElement);
+}
+
+
+/**
+ * Removes background layer.
+ */
+const removeClickableBackground = () => {
+    bgElement.remove();
+}
+
+
+/**
+ * Registration of client events for convenient usage
+ */
+buttonForward.onclick = (e) => blurAndCall(e, gotoNext);
+buttonBackward.onclick = (e) => blurAndCall(e, gotoPrevious);
+buttonEscape.onclick = (e) => blurAndCall(e, closeTooltip);
+buttonClose.onclick = (e) => blurAndCall(e, closeTooltip);
+
+on('key-Left', () => {
+    if (!isOpen) return;
+    gotoPrevious();
+});
+
+on('key-Right', () => {
+    if (!isOpen) return;
+    gotoNext();
+});
+
+on('key-Escape', () => {
+    if (!isOpen) return;
+    startScrolling();
+    closeTooltip();
+});

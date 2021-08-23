@@ -1,5 +1,4 @@
-import projects from '../config/projects.json';
-import techs from '../config/tech.json';
+import projects from './_projects.json';
 
 export interface Project {
     title: string;
@@ -9,13 +8,8 @@ export interface Project {
     stack: string[];
 }
 
-export interface Tech {
-    title: string;
-    short: string;
-    color: string;
-}
-
 let clickCallback: (this: GlobalEventHandlers, ev: MouseEvent) => any;
+
 
 /**
 * Creates a container filled with all projects.
@@ -31,28 +25,6 @@ export const createContainer = (): HTMLDivElement => {
     return container;
 };
 
-export const getProject = (title: string): Project | false => {
-    const project = projects.find(v => v.title === title) as Project;
-    if (!project) return false;
-
-    return project;
-};
-
-export const getTech = (short: string): Tech | false => {
-    const tech = techs.find(t => t.short === short) as Tech;
-    if (!tech) return false;
-
-    return tech;
-}
-
-/**
- * Registers an event listener for each project.
- * 
- * @param callback
- */
-export const onProjectClick = (callback: (this: GlobalEventHandlers, ev: MouseEvent) => any): void => {
-    clickCallback = callback;
-};
 
 /**
  * Fills container with specified projects as anchor tags.
@@ -68,4 +40,28 @@ const addProjectsTo = (container: Element): void => {
 
         container.appendChild(p);
     }
+};
+
+
+/**
+ * Finds project by it's title.
+ * 
+ * @param title - title of project
+ * @returns project object or false if nothing found
+ */
+export const getProject = (title: string): Project | false => {
+    const project = projects.find(v => v.title === title) as Project;
+    if (!project) return false;
+
+    return project;
+};
+
+
+/**
+ * Registers an event listener for each project.
+ * 
+ * @param callback
+ */
+export const onProjectClick = (callback: (this: GlobalEventHandlers, ev: MouseEvent) => any): void => {
+    clickCallback = callback;
 };
