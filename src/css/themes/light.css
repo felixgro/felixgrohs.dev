@@ -12,4 +12,13 @@ body.light {
 	--project-hover-bg: #e5e5e5;
 	--project-active-txt: #111;
 	--project-active-bg: #dadada;
+
+	--tooltip-close-path: #4e4e4e;
+	--tooltip-close-hover-path: #ddd;
+	--tooltip-close-bg: none;
+	--tooltip-close-hover-bg: #2e2e2e;
+
+	--tooltip-header: #676767;
+	--tooltip-paragraph: #fff;
+	--tooltip-hr: #2f2f2f;
 }
