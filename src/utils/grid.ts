@@ -1,3 +1,5 @@
+import { on } from './events';
+
 const lines: Line[] = [],
     lineWidth = 2,
     lineColor = '#272729';
@@ -67,11 +69,14 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
     lines.push(new Line(cellElements[1] as Element, Position.Bottom));
     lines.push(new Line(cellElements[3] as Element, Position.Top));
 
-    // draw lines
+    // draw all lines
     for (const line of lines) line.draw(ctx);
+
+    // redraw grid when window resizes..
+    on('resize', redrawGrid);
 }
 
-export const renderGrid = () => {
+const redrawGrid = () => {
     canvas.height = canvas.clientHeight;
     canvas.width = canvas.clientWidth;
     canvasBcr = canvas.getBoundingClientRect();
