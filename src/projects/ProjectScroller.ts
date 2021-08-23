@@ -56,32 +56,6 @@ export default () => {
 
 	// Accessibility for project scroller
 
-	const leftNeighbor = (): HTMLAnchorElement => {
-		const subSection = currentProject!.parentElement!;
-		let neighbor: Element;
-
-		if (subSection.firstElementChild !== currentProject!) {
-			neighbor = currentProject!.previousElementSibling!;
-		} else {
-			neighbor = subSection.previousElementSibling!.lastElementChild!;
-		}
-
-		return neighbor as HTMLAnchorElement;
-	}
-
-	const rightNeighbor = (): HTMLAnchorElement => {
-		const subSection = currentProject!.parentElement!;
-		let neighbor: Element;
-
-		if (subSection.lastElementChild !== currentProject!) {
-			neighbor = currentProject!.nextElementSibling!;
-		} else {
-			neighbor = subSection.nextElementSibling!.firstElementChild!;
-		}
-
-		return neighbor as HTMLAnchorElement;
-	}
-
 	focusCatch.onfocus = (e: Event) => {
 		e.preventDefault();
 
@@ -110,6 +84,32 @@ export default () => {
 		// put focus on following anchor
 		(document.querySelector('footer.main a') as HTMLAnchorElement).focus();
 	});
+}
+
+export const leftNeighbor = (): HTMLAnchorElement => {
+	const subSection = currentProject!.parentElement!;
+	let neighbor: Element;
+
+	if (subSection.firstElementChild !== currentProject!) {
+		neighbor = currentProject!.previousElementSibling!;
+	} else {
+		neighbor = subSection.previousElementSibling!.lastElementChild!;
+	}
+
+	return neighbor as HTMLAnchorElement;
+}
+
+export const rightNeighbor = (): HTMLAnchorElement => {
+	const subSection = currentProject!.parentElement!;
+	let neighbor: Element;
+
+	if (subSection.lastElementChild !== currentProject!) {
+		neighbor = currentProject!.nextElementSibling!;
+	} else {
+		neighbor = subSection.nextElementSibling!.firstElementChild!;
+	}
+
+	return neighbor as HTMLAnchorElement;
 }
 
 /**

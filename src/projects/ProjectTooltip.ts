@@ -1,6 +1,7 @@
 import { getProject, getTech, Project } from './ProjectFactory';
-import { startScrolling } from './ProjectScroller';
+import { startScrolling, leftNeighbor, rightNeighbor } from './ProjectScroller';
 import trapFocus, { FocusTrap } from '../utils/trapFocus';
+import Swipe from '../utils/swipe';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
@@ -26,6 +27,7 @@ export const displayProject = (a: HTMLAnchorElement) => {
 
     if (isOpen) {
         switchTo(project);
+        preview.focus();
     } else {
         assignProjectToTooltip(project);
         openTooltip();
@@ -135,6 +137,14 @@ export const openTooltip = () => {
     addClickableBackground();
     focusTrap = trapFocus(tooltip);
     preview.focus();
+
+    new Swipe(document.querySelector('.projects')!)
+        .onLeft(() => {
+            rightNeighbor().click();
+        })
+        .onRight(() => {
+            leftNeighbor().click()
+        }).run();
 };
 
 /**
