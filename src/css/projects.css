@@ -11,15 +11,24 @@
 		top: 0;
 		width: 100%;
 		z-index: 1;
-		/* box-shadow: inset 25px 0px 25px -25px var(--bg-app),
-			inset -25px 0px 25px -25px var(--bg-app); */
+
 		& div {
 			position: absolute;
 			height: 100%;
 			width: 100px;
-			background: linear-gradient(
+			/* background: linear-gradient(
 				90deg,
 				var(--bg-app) 0%,
+				rgba(255, 255, 255, 0) 100%
+			); */
+			background: -webkit-linear-gradient(
+				to right,
+				rgba(245, 245, 245, 0.8),
+				#f5f5f5 65%
+			);
+			background: linear-gradient(
+				to right,
+				var(--bg-app),
 				rgba(255, 255, 255, 0) 100%
 			);
 
@@ -78,16 +87,16 @@
 			-ms-user-select: none;
 			user-select: none;
 
+			&.active {
+				color: var(--project-active-txt);
+				background: var(--project-active-bg);
+			}
+
 			@media (hover: hover) and (pointer: fine) {
 				&:hover {
 					color: var(--project-hover-txt);
 					background: var(--project-hover-bg);
 				}
-			}
-
-			&.active {
-				color: var(--project-active-txt);
-				background: var(--project-active-bg);
 			}
 		}
 	}

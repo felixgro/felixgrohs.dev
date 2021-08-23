@@ -1,24 +1,33 @@
 header {
 	display: flex;
 	justify-content: space-between;
-    align-items: center;
-    z-index: 100;
+	align-items: center;
+	z-index: 100;
 }
 
 header .logo {
-    padding: 0 10px;
+	padding: 0 10px;
+
+	& path {
+		fill: var(--logo-path);
+	}
 }
 
 header nav {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
+	display: flex;
+	align-items: center;
+	margin-right: 10px;
 }
 
 header nav ul li {
-    display: inline-block;
+	display: inline-block;
 }
 
 header nav ul li a {
-    padding: 30px 7px;
+	padding: 30px 7px;
+	color: var(--email);
+
+	&:hover {
+		color: var(--email-hover);
+	}
 }

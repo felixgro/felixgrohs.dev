@@ -21,4 +21,13 @@ footer.main nav ul li a {
 	display: flex;
 	align-items: center;
 	padding: 8px 7px;
+
+	& svg path {
+		fill: var(--socials-path);
+		transition: fill 120ms ease-out;
+	}
+
+	&:hover svg path {
+		fill: var(--socials-hover-path);
+	}
 }

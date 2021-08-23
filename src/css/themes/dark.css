@@ -1,11 +1,18 @@
 body.dark {
 	/* Main Theme */
 	--bg-main: hsl(240, 8%, 10%);
-	--bg-app: hsl(240, 7%, 11%);
+	--bg-app: rgba(26, 26, 30, 100%);
 
-	--txt-1: #e7e7e7;
-	--txt-2: #222;
-	--txt-3: #333;
+	--txt-1: hsl(240, 9%, 90%);
+	--txt-2: hsl(240, 7%, 70%);
+	--txt-3: hsl(240, 5%, 25%);
+
+	--logo-path: var(--txt-1);
+	--socials-path: var(--txt-3);
+	--socials-hover-path: #6562fc;
+
+	--email: var(--txt-2);
+	--email-hover: #6562fc;
 
 	/* Projects Scroller */
 	--project-txt: hsl(240, 4%, 56%);

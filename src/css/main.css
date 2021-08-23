@@ -66,6 +66,10 @@ main article {
 	margin-left: clamp(0px, 3.5vw, 150px);
 }
 
+main p {
+	color: var(--txt-2);
+}
+
 canvas.animated-grid {
 	position: absolute;
 	height: 100%;
