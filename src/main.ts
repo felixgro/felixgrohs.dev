@@ -3,8 +3,8 @@ import animateGrid from './utils/grid';
 import { on } from './utils/events';
 
 // check client's system theme
-const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-if (isDark) document.body.className = 'dark';
+// const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+// if (isDark) document.body.className = 'dark';
 
 on('load', () => {
     // Start scrolling through projects

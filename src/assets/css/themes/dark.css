@@ -1,11 +1,14 @@
 body.dark {
 	/* Main Theme */
-	--bg-main: hsl(240, 8%, 10%);
-	--bg-app: rgba(26, 26, 30, 100%);
+	--bg-main: hsl(240, 13%, 11%);
+	--bg-app: hsl(240, 14%, 12%);
 
 	--txt-1: hsl(240, 9%, 90%);
 	--txt-2: hsl(240, 7%, 70%);
 	--txt-3: hsl(240, 5%, 25%);
+
+	--h2-color: hsl(240, 15%, 40%);
+	--intro-color: hsl(240, 15%, 40%);
 
 	--logo-path: var(--txt-1);
 	--socials-path: var(--txt-3);
@@ -24,11 +27,11 @@ body.dark {
 
 	/* Projects Tooltip */
 	--tooltip-bg: hsl(240, 6%, 17%);
-	--tooltip-header: var(--txt-1);
+	--tooltip-header: hsl(240, 6%, 30%);
 	--tooltip-paragraph: #c3c2ca;
 	--tooltip-footer-bg: hsl(240, 5%, 15%);
 
-	--tooltip-actions-path: #4e4e4e;
+	--tooltip-actions-path: var(--tooltip-header);
 	--tooltip-actions-hover-path: #fff;
 	--tooltip-close-path: #4e4e4e;
 	--tooltip-close-bg: none;

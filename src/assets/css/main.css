@@ -10,32 +10,32 @@
 @font-face {
 	font-family: Lato;
 	font-weight: 300;
-	src: url('../assets/fonts/Lato-Light.ttf');
+	src: url('../fonts/Lato-Light.ttf');
 }
 
 @font-face {
 	font-family: Lato;
 	font-weight: 400;
-	src: url('../assets/fonts/Lato-Regular.ttf');
+	src: url('../fonts/Lato-Regular.ttf');
 }
 
 @font-face {
 	font-family: Lato;
 	font-weight: 700;
-	src: url('../assets/fonts/Lato-Bold.ttf');
+	src: url('../fonts/Lato-Bold.ttf');
 }
 
 @font-face {
 	font-family: Lato;
 	font-weight: 900;
-	src: url('../assets/fonts/Lato-Black.ttf');
+	src: url('../fonts/Lato-Black.ttf');
 }
 
 body {
 	justify-content: center;
 	align-items: center;
 
-	padding: clamp(20px, 5vw, 180px);
+	padding: clamp(10px, 3vw, 180px);
 	background: var(--bg-main);
 }
 
@@ -55,6 +55,9 @@ body {
 	position: relative;
 	display: grid;
 	grid-template-rows: 75px 1fr auto 35px;
+	& .h2 {
+		color: var(--h2-color);
+	}
 }
 
 main {
@@ -63,7 +66,7 @@ main {
 }
 
 main article {
-	margin-left: clamp(0px, 3.5vw, 150px);
+	margin-left: clamp(0px, 6vw, 450px);
 }
 
 main p {

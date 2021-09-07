@@ -20,6 +20,18 @@ let currentProject: HTMLAnchorElement | null,
 	isCentering = false,
 	margin = window.innerWidth * 1.5;
 
+const fadeToTransparent = (el: HTMLElement, dir: string, rgb: string) => {
+	const transparentBg = rgb.split('').map(c => {
+		switch (c) {
+			case 'b': return 'ba';
+			case ')': return ',0)';
+			default: return c;
+		}
+	}).join('');
+
+	el.style.background = `linear-gradient(${dir}, ${rgb}, ${transparentBg})`;
+}
+
 /**
  * Initialize by filling parent container with all configured projects, assign variables and start auto scrolling.
  */
@@ -33,6 +45,11 @@ export default () => {
 		const project = e.target as HTMLAnchorElement;
 		if (project !== currentProject) centerProject(project);
 	}, clickDebounce));
+
+	const bg = getComputedStyle(document.querySelector('#app') as HTMLDivElement).backgroundColor;
+
+	fadeToTransparent(document.querySelector('.left-cover')!, 'to right', bg);
+	fadeToTransparent(document.querySelector('.right-cover')!, 'to left', bg);
 
 	fillParentContainer();
 	firstContainer = parentContainer.firstElementChild as HTMLDivElement;

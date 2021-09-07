@@ -1,8 +1,9 @@
+import debounce from './debounce';
 import { on } from './events';
 
 const lines: Line[] = [],
     lineWidth = 2,
-    lineColor = '#272729';
+    lineColor = 'hsl(241, 16%, 15%)';
 
 let canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
@@ -60,7 +61,7 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
 
     ctx = canvas.getContext('2d')!;
 
-    // todo: automatically create lines without duplication
+    // TODO: automatically create lines without duplication
     lines.push(new Line(canvas, Position.Top));
     lines.push(new Line(canvas, Position.Left));
     lines.push(new Line(canvas, Position.Right));
@@ -73,7 +74,10 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
     for (const line of lines) line.draw(ctx);
 
     // redraw grid when window resizes..
-    on('resize', redrawGrid);
+    on('resize', debounce(redrawGrid, 240, {
+        leading: false,
+        trailing: true
+    }));
 }
 
 const redrawGrid = () => {

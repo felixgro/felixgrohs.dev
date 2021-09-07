@@ -11,34 +11,15 @@
 		top: 0;
 		width: 100%;
 		z-index: 1;
+		margin: 0 -1px;
 
 		& div {
 			position: absolute;
 			height: 100%;
 			width: 100px;
-			/* background: linear-gradient(
-				90deg,
-				var(--bg-app) 0%,
-				rgba(255, 255, 255, 0) 100%
-			); */
-			background: -webkit-linear-gradient(
-				to right,
-				rgba(245, 245, 245, 0.8),
-				#f5f5f5 65%
-			);
-			background: linear-gradient(
-				to right,
-				var(--bg-app),
-				rgba(255, 255, 255, 0) 100%
-			);
 
 			&.right-cover {
 				right: 0;
-				background: linear-gradient(
-					-90deg,
-					var(--bg-app) 0%,
-					rgba(255, 255, 255, 0) 100%
-				);
 			}
 		}
 	}
@@ -105,25 +86,26 @@
 .project-tooltip {
 	position: fixed;
 	display: none;
-	width: 80%;
+	width: 90%;
 	left: 50%;
 	transform: translateX(-50%);
-	max-width: 480px;
+	max-width: 580px;
 	border-radius: 10px;
 	background: var(--tooltip-bg);
 	transform-origin: bottom center;
 	z-index: 200;
 	box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.05);
 
-	--vertical-padding: 22px;
-	--footer-height: 54px;
+	--horizontal-padding-header: clamp(17px, 3.4vw, 20px);
+	--vertical-padding: clamp(1px, 3.6vw, 25px);
+	--footer-height: clamp(56px, 3.4vw, 80px);
 
 	& header {
 		color: var(--tooltip-header);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 15px var(--vertical-padding);
+		padding: var(--horizontal-padding-header) var(--vertical-padding);
 
 		& .keyboard-actions {
 			display: flex;
@@ -148,37 +130,12 @@
 				transform: translateX(0.5px);
 			}
 		}
-
-		& button.touch-close {
-			box-sizing: border-box;
-			padding: 12px;
-			display: none;
-			justify-content: center;
-			align-items: center;
-			border-radius: 50%;
-			background: var(--tooltip-close-bg);
-			transition: background 120ms ease-out;
-
-			& svg path {
-				stroke: var(--tooltip-close-path);
-				transition: stroke 120ms ease-out;
-			}
-
-			&:hover,
-			&:focus {
-				background: var(--tooltip-close-hover-bg);
-
-				& svg path {
-					stroke: var(--tooltip-close-hover-path);
-				}
-			}
-		}
 	}
 
 	& p {
 		color: var(--tooltip-paragraph);
 		letter-spacing: 0.02em;
-		margin-bottom: var(--footer-height);
+		margin-bottom: calc(var(--footer-height) * 1.05);
 		padding: 0 var(--vertical-padding) 25px var(--vertical-padding);
 	}
 
@@ -212,6 +169,7 @@
 		& nav {
 			display: flex;
 			align-items: center;
+			flex-wrap: nowrap;
 		}
 
 		& a {
@@ -219,12 +177,14 @@
 			font-size: 14px;
 			padding: 6px 12px;
 			transition: color 120ms ease-out;
+			overflow: hidden;
 
 			&.preview {
 				background: #6462fc;
 				color: #e0dffb;
 				border-radius: 6px;
-				margin-left: 5px;
+				margin-left: 6px;
+				padding: clamp(3px, 3vw, 8px) clamp(7px, 3vw, 12px);
 			}
 
 			& svg {

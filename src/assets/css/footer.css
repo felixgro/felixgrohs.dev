@@ -2,10 +2,12 @@ footer.main {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	box-sizing: border-box;
+	padding: 0 20px;
 }
 
 footer.main nav {
-	margin-right: 10px;
+	margin-right: -7px;
 }
 
 footer.main nav ul {
@@ -20,7 +22,7 @@ footer.main nav ul li {
 footer.main nav ul li a {
 	display: flex;
 	align-items: center;
-	padding: 8px 7px;
+	padding: 10px 7px;
 
 	& svg path {
 		fill: var(--socials-path);

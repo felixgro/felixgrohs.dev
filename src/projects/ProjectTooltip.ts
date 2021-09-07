@@ -14,7 +14,6 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     buttonBackward = tooltip.querySelector<HTMLButtonElement>('button.backward')!,
     buttonEscape = tooltip.querySelector<HTMLButtonElement>('button.escape')!,
     buttonForward = tooltip.querySelector<HTMLButtonElement>('button.forward')!,
-    buttonClose = tooltip.querySelector<HTMLButtonElement>('button.touch-close')!,
     duration = 200; // Duration for tooltip animation in ms
 
 let swiper: Swipe,
@@ -260,7 +259,6 @@ const removeClickableBackground = () => {
 buttonForward.onclick = (e) => blurAndCall(e, gotoNext);
 buttonBackward.onclick = (e) => blurAndCall(e, gotoPrevious);
 buttonEscape.onclick = (e) => blurAndCall(e, closeTooltip);
-buttonClose.onclick = (e) => blurAndCall(e, closeTooltip);
 
 on('key-Left', () => {
     if (!isOpen) return;

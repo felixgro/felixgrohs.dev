@@ -2,21 +2,21 @@ header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	box-sizing: border-box;
+	padding: 0 22px;
 	z-index: 100;
-}
 
-header .logo {
-	padding: 0 10px;
-
-	& path {
-		fill: var(--logo-path);
+	& .logo {
+		margin-left: -5px;
+		& path {
+			fill: var(--logo-path);
+		}
 	}
 }
 
 header nav {
 	display: flex;
 	align-items: center;
-	margin-right: 10px;
 }
 
 header nav ul li {
@@ -24,7 +24,8 @@ header nav ul li {
 }
 
 header nav ul li a {
-	padding: 30px 7px;
+	padding: 28px 10px;
+	margin-right: -10px;
 	color: var(--email);
 	transition: color 120ms ease-out;
 
