@@ -34,7 +34,7 @@ export const createContainer = (): HTMLDivElement => {
 const addProjectsTo = (container: Element): void => {
     for (const project of projects) {
         const p = document.createElement('div');
-        p.className = 'project-anchor';
+        p.className = 'project-anchor no-select';
         p.innerHTML = project.title;
         p.onclick = clickCallback;
 
