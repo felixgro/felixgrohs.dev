@@ -70,6 +70,14 @@ export default () => {
 		trailing: true
 	}));
 
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'hidden') {
+			stopScrolling();
+		} else {
+			if (!currentProject) startScrolling();
+		}
+	});
+
 	// Accessibility for project scroller
 	focusCatch.onfocus = (e: Event) => {
 		e.preventDefault();
