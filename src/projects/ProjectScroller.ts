@@ -44,7 +44,7 @@ export default () => {
 
 		const project = e.target as HTMLAnchorElement;
 		if (project !== currentProject) centerProject(project);
-	}, clickDebounce));
+	}, { timeout: clickDebounce }));
 
 	const bg = getComputedStyle(document.querySelector('#app') as HTMLDivElement).backgroundColor;
 
@@ -60,12 +60,13 @@ export default () => {
 	parentContainer.ontouchmove = (e: Event) => e.preventDefault();
 	parentContainer.onscroll = (e: Event) => e.preventDefault();
 
-	on('resize', debounce(closeTooltip, 500))
+	on('resize', debounce(closeTooltip, { timeout: 500 }));
 
 	on('resize', debounce(() => {
 		margin = window.innerWidth * 1.5;
 		parentBcr = parentContainer.getBoundingClientRect();
-	}, 500, {
+	}, {
+		timeout: 240,
 		leading: false,
 		trailing: true
 	}));

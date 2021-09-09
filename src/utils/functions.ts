@@ -29,12 +29,14 @@ export const memoize = <MF extends DefaultFunction>(fn: MF): MF => {
  * @param options - set trailing and/or leading option
  * @returns debounced function
  */
-export const debounce = (fn: DefaultFunction, timeout: number, options?: {
-    leading?: Boolean;
-    trailing?: Boolean;
+export const debounce = (fn: DefaultFunction, options?: {
+    timeout?: number
+    leading?: boolean;
+    trailing?: boolean;
 }): DefaultFunction => {
     let timeoutId: number | null;
     const config = Object.assign({}, {
+        timeout: 120,
         leading: true,
         trailing: false
     }, options);
@@ -55,6 +57,6 @@ export const debounce = (fn: DefaultFunction, timeout: number, options?: {
             }
 
             timeoutId = null;
-        }, timeout);
+        }, config.timeout);
     }
 }

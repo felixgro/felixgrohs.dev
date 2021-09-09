@@ -1,5 +1,11 @@
-import { debounce } from './functions';
 import { on } from './events';
+
+enum Position {
+    Top,
+    Right,
+    Bottom,
+    Left
+}
 
 const lines: Line[] = [],
     lineWidth = 2,
@@ -8,13 +14,6 @@ const lines: Line[] = [],
 let canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
     canvasBcr: DOMRect;
-
-enum Position {
-    Top,
-    Right,
-    Bottom,
-    Left
-}
 
 class Line {
     constructor(
@@ -74,10 +73,7 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
     for (const line of lines) line.draw(ctx);
 
     // redraw grid when window resizes..
-    on('resize', debounce(redrawGrid, 240, {
-        leading: false,
-        trailing: true
-    }));
+    on('resize', redrawGrid);
 }
 
 const redrawGrid = () => {

@@ -21,10 +21,6 @@ export const fire = (event: string, ...payload: any[]) => {
 export const hasEvent = (event: string): boolean => event in events;
 
 
-/**
- *  Passing necessary browser events through eventbus...
- * 
- */
 window.onload = (e: Event) => fire('load', e);
 window.onresize = (e: Event) => fire('resize', e);
 
@@ -36,4 +32,4 @@ document.onkeydown = debounce((e: KeyboardEvent) => {
     } else {
         fire(`key-${e.code}`, e);
     }
-}, 120);
+});
