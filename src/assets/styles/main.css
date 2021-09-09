@@ -172,7 +172,7 @@ footer.grid-cell {
 .project-tooltip {
 	display: none;
 	position: fixed;
-	width: 90%;
+	width: 85%;
 	max-width: 580px;
 	left: 50%;
 	transform: translateX(-50%);
@@ -187,44 +187,19 @@ footer.grid-cell {
 	--footer-height: clamp(56px, 3.4vw, 80px);
 
 	& header {
-		color: var(--tooltip-header);
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: var(--horizontal-padding-header) var(--vertical-padding);
+		color: var(--tooltip-header);
 
-		& .keyboard-actions {
+		& .stack {
 			display: flex;
 			align-items: center;
-
-			& button {
-				padding: 5px;
-				cursor: pointer;
-
-				& svg path {
-					fill: var(--tooltip-actions);
-					transition: fill 120ms ease-out;
-
-					&:focus {
-						fill: var(--tooltip-actions-hover);
-					}
-				}
-				@media (hover: hover) and (pointer: fine) {
-					&:hover svg path {
-						fill: var(--tooltip-actions-hover);
-					}
-				}
-
-				@media (hover: hover) and (pointer: fine) {
-					&:not(.active):hover {
-						color: var(--project-hover-txt);
-						background: var(--project-hover-bg);
-					}
-				}
-			}
-
-			& .escape {
-				transform: translateX(0.5px);
+			& img {
+				height: 16px;
+				margin-right: 5px;
+				display: none;
 			}
 		}
 	}
@@ -250,15 +225,7 @@ footer.grid-cell {
 		background: var(--tooltip-footer-bg);
 		z-index: 1;
 
-		& .stack {
-			display: flex;
-			align-items: center;
-
-			& img {
-				height: 16px;
-				margin-right: 5px;
-				display: none;
-			}
+		& .actions {
 		}
 
 		& nav {
@@ -267,23 +234,23 @@ footer.grid-cell {
 			flex-wrap: nowrap;
 
 			& a {
-				color: #7a7983;
+				color: var(--tooltip-source);
 				font-size: 14px;
 				padding: 6px 12px;
 				transition: color 120ms ease-out;
 				overflow: hidden;
 
 				&.preview {
-					background: #6462fc;
-					color: #e0dffb;
+					background: var(--tooltip-preview-bg);
+					color: var(--tooltip-preview);
 					border-radius: 6px;
-					margin-left: 6px;
+					margin-left: 8px;
 					padding: clamp(3px, 3vw, 8px) clamp(7px, 3vw, 12px);
 
 					& svg {
 						margin-right: 2px;
 						& polygon {
-							fill: #e0dffb;
+							fill: var(--tooltip-preview-icon);
 							transition: fill 120ms ease-out;
 						}
 					}
