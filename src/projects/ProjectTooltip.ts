@@ -1,6 +1,7 @@
 import { getProject, Project } from './ProjectFactory';
 import { startScrolling } from './ProjectScroller';
 import { trapFocus, blurAndCall } from '../utils/dom';
+import { debounce } from '../utils/functions';
 import swipe, { Swipe } from '../utils/swipe';
 import { on } from '../utils/events';
 
@@ -20,7 +21,6 @@ let swiper: Swipe,
     focusTrap = trapFocus(tooltip),
     bgElement: HTMLDivElement,
     isOpen = false;
-
 
 /**
  * Displays a new project within the tooltip.
@@ -255,6 +255,8 @@ const removeClickableBackground = () => {
 /**
  * Registration of client events for convenient usage
  */
+on('resize', debounce(closeTooltip, { timeout: 500 }));
+
 buttonForward.onclick = (e) => blurAndCall(e, gotoNext);
 buttonBackward.onclick = (e) => blurAndCall(e, gotoPrevious);
 buttonEscape.onclick = (e) => blurAndCall(e, closeTooltip);

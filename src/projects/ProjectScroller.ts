@@ -1,7 +1,7 @@
 import { createContainer, onProjectClick } from './ProjectFactory';
-import { displayProject, closeTooltip } from './ProjectTooltip';
-import { on } from '../utils/events';
+import { displayProject } from './ProjectTooltip';
 import { debounce } from '../utils/functions';
+import { on } from '../utils/events';
 
 const focusCatch = document.querySelector('.focus-catch') as HTMLAnchorElement,
 	scrollSpeed = .9,
@@ -59,8 +59,6 @@ export default () => {
 
 	parentContainer.ontouchmove = (e: Event) => e.preventDefault();
 	parentContainer.onscroll = (e: Event) => e.preventDefault();
-
-	on('resize', debounce(closeTooltip, { timeout: 500 }));
 
 	on('resize', debounce(() => {
 		margin = window.innerWidth * 1.5;
@@ -196,7 +194,6 @@ const fillParentContainer = () => {
 	do {
 		const subContainer = appendContainer();
 		currentWidth += subContainer.clientWidth;
-
 	} while (currentWidth < parentBcr.width + margin);
 
 	currentScroll = margin;
