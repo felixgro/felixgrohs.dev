@@ -1,7 +1,7 @@
 import { createContainer, onProjectClick } from './ProjectFactory';
 import { displayProject, closeTooltip } from './ProjectTooltip';
 import { on } from '../utils/events';
-import debounce from '../utils/debounce';
+import { debounce } from '../utils/functions';
 
 const focusCatch = document.querySelector('.focus-catch') as HTMLAnchorElement,
 	scrollSpeed = .9,

@@ -1,4 +1,4 @@
-import debounce from '../utils/debounce';
+import { debounce } from '../utils/functions';
 
 type Callback = (...args: any[]) => void;
 

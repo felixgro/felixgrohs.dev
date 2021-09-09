@@ -1,4 +1,4 @@
-import debounce from './debounce';
+import { debounce } from './functions';
 import { on } from './events';
 
 const lines: Line[] = [],

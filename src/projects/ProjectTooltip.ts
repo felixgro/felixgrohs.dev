@@ -1,9 +1,8 @@
 import { getProject, Project } from './ProjectFactory';
 import { startScrolling } from './ProjectScroller';
-import trapFocus, { FocusTrap } from '../utils/trapFocus';
+import { trapFocus, blurAndCall } from '../utils/dom';
 import swipe, { Swipe } from '../utils/swipe';
 import { on } from '../utils/events';
-import blurAndCall from '../utils/blurAndCall';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
@@ -12,13 +11,13 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     source = tooltip.querySelector<HTMLAnchorElement>('a.source')!,
     preview = tooltip.querySelector<HTMLAnchorElement>('a.preview')!,
     buttonBackward = tooltip.querySelector<HTMLButtonElement>('button.backward')!,
-    buttonEscape = tooltip.querySelector<HTMLButtonElement>('button.escape')!,
+    buttonEscape = tooltip.querySelector<HTMLButtonElement>('button.close')!,
     buttonForward = tooltip.querySelector<HTMLButtonElement>('button.forward')!,
     duration = 200; // Duration for tooltip animation in ms
 
 let swiper: Swipe,
     currentProject: HTMLAnchorElement | null,
-    focusTrap: FocusTrap,
+    focusTrap = trapFocus(tooltip),
     bgElement: HTMLDivElement,
     isOpen = false;
 
@@ -71,7 +70,7 @@ export const openTooltip = () => {
 
     addClickableBackground();
     swiper.start();
-    focusTrap = trapFocus(tooltip);
+    focusTrap.trap();
 };
 
 
