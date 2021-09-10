@@ -2,6 +2,7 @@ import { getProject, Project } from './ProjectFactory';
 import { startScrolling } from './ProjectScroller';
 import { trapFocus, blurAndCall } from '../utils/dom';
 import { debounce } from '../utils/functions';
+import { addStylesTo } from '../utils/css';
 import swipe, { Swipe } from '../utils/swipe';
 import { on } from '../utils/events';
 
@@ -233,10 +234,10 @@ const switchTo = (project: Project) => {
  */
 const addClickableBackground = () => {
     bgElement = document.createElement('div');
-    Object.assign(bgElement.style, {
+    addStylesTo(bgElement, {
         position: 'fixed',
         inset: 0,
-        'z-index': 100,
+        zIndex: 100
     });
 
     bgElement.onclick = closeTooltip;
