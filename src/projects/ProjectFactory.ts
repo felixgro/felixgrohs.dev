@@ -1,4 +1,5 @@
 import projects from './_projects.json';
+import { memoize } from '../utils/functions';
 
 export interface Project {
     title: string;
@@ -35,7 +36,7 @@ const addProjectsTo = (container: Element): void => {
     for (const project of projects) {
         const p = document.createElement('div');
         p.className = 'project-anchor no-select';
-        p.innerHTML = project.title;
+        p.innerText = project.title;
         p.onclick = clickCallback;
 
         container.appendChild(p);
@@ -49,12 +50,10 @@ const addProjectsTo = (container: Element): void => {
  * @param title - title of project
  * @returns project object or false if nothing found
  */
-export const getProject = (title: string): Project | false => {
+export const getProject = memoize((title: string): Project | false => {
     const project = projects.find(v => v.title === title) as Project;
-    if (!project) return false;
-
-    return project;
-};
+    return project ? project : false;
+});
 
 
 /**
