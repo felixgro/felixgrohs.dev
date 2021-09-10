@@ -1,27 +1,24 @@
 import { debounce } from '../utils/functions';
 
-type Callback = (...args: any[]) => void;
+type EventCallback = (...args: any[]) => void;
 
-export const events: { [title: string]: Callback[] } = {};
+const events: { [title: string]: EventCallback[] } = {};
 
-export const on = (event: string, fn: Callback) => {
-    if (hasEvent(event)) {
-        events[event].push(fn);
-    } else {
+export const on = (event: string, fn: EventCallback) => {
+    hasEvent(event) ?
+        events[event].push(fn) :
         events[event] = [fn];
-    }
 }
 
 export const fire = (event: string, ...payload: any[]) => {
-    if (!hasEvent(event)) return;
-
-    for (const fn of events[event]) fn.call({}, ...payload);
+    hasEvent(event) && events[event].forEach(cb => cb.call({}, ...payload));
 }
 
 export const hasEvent = (event: string): boolean => event in events;
 
 
 window.onload = (e: Event) => fire('load', e);
+
 window.onresize = (e: Event) => fire('resize', e);
 
 document.onkeydown = debounce((e: KeyboardEvent) => {
