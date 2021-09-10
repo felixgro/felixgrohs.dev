@@ -17,6 +17,10 @@ export const memoize = <MF extends DefaultFunction>(fn: MF): MF => {
     }) as MF;
 }
 
+export const assignDefaults = <T extends { [key: string]: any }>(options: T, defaultOptions: T): T => {
+    return Object.assign({}, defaultOptions, options);
+}
+
 
 /**
  * Argument function is triggered after first call of returned function and waits given timeout
