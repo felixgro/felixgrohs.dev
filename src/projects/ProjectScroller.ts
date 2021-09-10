@@ -1,13 +1,11 @@
-import { createContainer, onProjectClick } from './ProjectFactory';
+import { createContainer } from './ProjectFactory';
 import { displayProject } from './ProjectTooltip';
 import { gradientToTransparent } from '../utils/css';
-import { debounce } from '../utils/functions';
 import { on } from '../utils/events';
 
 const focusCatch = document.querySelector('.focus-catch') as HTMLAnchorElement,
 	scrollSpeed = .9,
-	centeringFactor = .9,
-	clickDebounce = 150;
+	centeringFactor = .9;
 
 let currentProject: HTMLAnchorElement | null,
 	parentContainer: HTMLDivElement,
@@ -24,19 +22,13 @@ let currentProject: HTMLAnchorElement | null,
 /**
  * Initialize by filling parent container with all configured projects, assign variables and start auto scrolling.
  */
-export default () => {
+export const initProjectScroller = () => {
 	parentContainer = document.querySelector('.projects')!;
 	parentBcr = parentContainer.getBoundingClientRect();
 
-	onProjectClick(debounce((e: Event) => {
-		e.preventDefault();
-
-		const project = e.target as HTMLAnchorElement;
-		if (project !== currentProject) centerProject(project);
-	}, { timeout: clickDebounce }));
-
 	const bg = getComputedStyle(document.querySelector('#app') as HTMLDivElement).backgroundColor;
 
+	// Add cover gradients
 	document.querySelector<HTMLDivElement>('.left-cover')!.style.background = gradientToTransparent(bg, 'to right');
 	document.querySelector<HTMLDivElement>('.right-cover')!.style.background = gradientToTransparent(bg, 'to left');
 
@@ -49,14 +41,10 @@ export default () => {
 	parentContainer.ontouchmove = (e: Event) => e.preventDefault();
 	parentContainer.onscroll = (e: Event) => e.preventDefault();
 
-	on('resize', debounce(() => {
+	on('post-resize', () => {
 		margin = window.innerWidth * 1.5;
 		parentBcr = parentContainer.getBoundingClientRect();
-	}, {
-		timeout: 240,
-		leading: false,
-		trailing: true
-	}));
+	});
 
 	document.addEventListener('visibilitychange', () => {
 		if (document.visibilityState === 'hidden') {
@@ -101,6 +89,14 @@ export const stopScrolling = () => {
 }
 
 
+const onContainerClick = (e: Event) => {
+	const target = e.target as HTMLAnchorElement;
+
+	if (target.classList.contains('project-anchor') && target !== currentProject)
+		centerProject(target);
+}
+
+
 /**
 * Appends a new container in parent.
 * 
@@ -108,6 +104,7 @@ export const stopScrolling = () => {
 */
 const appendContainer = (): HTMLDivElement => {
 	lastContainer = createContainer();
+	lastContainer.onclick = onContainerClick;
 	parentContainer.appendChild(lastContainer);
 
 	return lastContainer;

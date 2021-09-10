@@ -1,5 +1,4 @@
 import projects from './_projects.json';
-import { memoize } from '../utils/functions';
 
 export interface Project {
     title: string;
@@ -9,9 +8,6 @@ export interface Project {
     stack: string[];
 }
 
-let clickCallback: (this: GlobalEventHandlers, ev: MouseEvent) => any;
-
-
 /**
 * Creates a container filled with all projects.
 * 
@@ -19,7 +15,7 @@ let clickCallback: (this: GlobalEventHandlers, ev: MouseEvent) => any;
 **/
 export const createContainer = (): HTMLDivElement => {
     const container = document.createElement('div');
-    container.className = 'sub-container';
+    container.className = 'sub-container no-select';
 
     addProjectsTo(container);
 
@@ -32,17 +28,14 @@ export const createContainer = (): HTMLDivElement => {
  * 
  * @param container 
  */
-const addProjectsTo = (container: Element): void => {
+const addProjectsTo = (container: HTMLDivElement): void => {
     for (const project of projects) {
-        const p = document.createElement('div');
-        p.className = 'project-anchor no-select';
-        p.innerText = project.title;
-        p.onclick = clickCallback;
-
-        container.appendChild(p);
+        const div = document.createElement('div');
+        div.className = 'project-anchor';
+        div.innerText = project.title;
+        container.appendChild(div);
     }
 };
-
 
 /**
  * Finds project by it's title.
@@ -50,17 +43,7 @@ const addProjectsTo = (container: Element): void => {
  * @param title - title of project
  * @returns project object or false if nothing found
  */
-export const getProject = memoize((title: string): Project | false => {
+export const getProject = (title: string): Project | false => {
     const project = projects.find(v => v.title === title) as Project;
     return project ? project : false;
-});
-
-
-/**
- * Registers an event listener for each project.
- * 
- * @param callback
- */
-export const onProjectClick = (callback: (this: GlobalEventHandlers, ev: MouseEvent) => any): void => {
-    clickCallback = callback;
 };
