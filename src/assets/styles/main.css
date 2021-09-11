@@ -110,23 +110,12 @@ footer.grid-cell {
 /* Main Project Scroller */
 .projects-container {
 	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	height: 60px;
 	width: 100%;
 	z-index: 150;
-
-	& .projects-cover {
-		position: absolute;
-		display: flex;
-		justify-content: space-between;
-		pointer-events: none;
-		margin: 0 -1px;
-		z-index: 1;
-		inset: 0;
-
-		& div {
-			width: 100px;
-		}
-	}
 
 	& .projects {
 		position: absolute;

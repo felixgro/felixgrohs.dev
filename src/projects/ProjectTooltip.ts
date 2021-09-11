@@ -3,7 +3,6 @@ import { startScrolling } from './ProjectScroller';
 import { trapFocus, blurAndCall } from '../utils/dom';
 import { debounce } from '../utils/functions';
 import { addStylesTo } from '../utils/css';
-import swipe, { Swipe } from '../utils/swipe';
 import { on } from '../utils/events';
 
 const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
@@ -17,8 +16,8 @@ const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
     buttonForward = tooltip.querySelector<HTMLButtonElement>('button.forward')!,
     duration = 200; // Duration for tooltip animation in ms
 
-let swiper: Swipe,
-    currentProject: HTMLAnchorElement | null,
+// TODO: currentProject
+let currentProject: HTMLAnchorElement | null,
     focusTrap = trapFocus(tooltip),
     bgElement: HTMLDivElement,
     isOpen = false;
@@ -70,7 +69,6 @@ export const openTooltip = () => {
     });
 
     addClickableBackground();
-    swiper.start();
     focusTrap.trap();
 };
 
@@ -99,7 +97,6 @@ export const closeTooltip = () => {
     setTimeout(() => tooltip.style.display = 'none', duration);
 
     removeClickableBackground();
-    swiper.stop();
     focusTrap.untrap();
     startScrolling();
 };
@@ -107,6 +104,7 @@ export const closeTooltip = () => {
 
 /**
  * Jump to next project.
+ * TODO: put in ProjectScroller
  */
 export const gotoNext = () => {
     if (!isOpen) return;
@@ -118,6 +116,7 @@ export const gotoNext = () => {
 
 /**
  * Jump to previous project.
+ * TODO: put in ProjectScroller
  */
 export const gotoPrevious = () => {
     if (!isOpen) return;
@@ -129,7 +128,7 @@ export const gotoPrevious = () => {
 
 /**
  * Get left neighbor of currently selected project.
- * 
+ * TODO: put in ProjectScroller
  * @returns project element
  */
 export const getLeftNeighbor = (): HTMLAnchorElement | void => {
@@ -150,7 +149,7 @@ export const getLeftNeighbor = (): HTMLAnchorElement | void => {
 
 /**
  * Get right neighbor of currently selected project.
- * 
+ * TODO: put in ProjectScroller
  * @returns project element
  */
 export const getRightNeighbor = (): HTMLAnchorElement | void => {
@@ -255,6 +254,7 @@ const removeClickableBackground = () => {
 
 /**
  * Registration of client events for convenient usage
+ * 
  */
 on('resize', debounce(closeTooltip, { timeout: 500 }));
 
@@ -277,7 +277,3 @@ on('key-Escape', () => {
     startScrolling();
     closeTooltip();
 });
-
-swiper = swipe(document.querySelector('.projects')!)
-    .onLeft(gotoNext)
-    .onRight(gotoPrevious);

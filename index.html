@@ -51,12 +51,10 @@
 		</main>
 
 		<aside class="projects-container grid-cell">
-			<a href="#" class="focus-catch hidden">Portfolio</a>
-			<div class="projects-cover" aria-hidden="true">
-				<div class="left-cover"></div>
-				<div class="right-cover"></div>
-			</div>
-			<div class="projects no-scrollbar" aria-hidden="true"></div>
+			<span class="fallback">
+				Visit me on <a href="https://github.com/felixgro">Github</a> for a selection of my
+				projects.
+			</span>
 		</aside>
 
 		<div class="project-tooltip" aria-hidden="true">
@@ -153,6 +151,12 @@
 
 		<canvas class="animated-grid"></canvas>
 	</div>
+
+	<script>
+		// Remove Fallbacks
+		const fallbacks = document.querySelectorAll('.fallback');
+		fallbacks.forEach(fb => fb.remove());
+	</script>
 
 	<script type="module" src="/src/main.ts"></script>
 </body>
