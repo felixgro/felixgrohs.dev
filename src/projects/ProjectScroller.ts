@@ -7,7 +7,8 @@ import { on } from '../utils/events';
 
 const scrollSpeed = .9,
 	distanceFactor = 1.7, // distance multiplicator for appending/prepending on client interaction
-	marginFactor = 1.5; // gets multiplied with innerWidth for margin
+	marginFactor = 1.5, // gets multiplied with innerWidth for margin
+	marginMin = 800;
 
 
 type ScrollState = 'scrolling' | 'centering' | 'idling';
@@ -47,6 +48,7 @@ export const initProjectScroller = () => {
 	on('post-resize', () => {
 		scrollFrame = scrollContainer.getBoundingClientRect();
 		margin = innerWidth * marginFactor;
+		if (margin < marginMin) margin = marginMin;
 	}, { immediately: true });
 
 	on('visible', () => {
