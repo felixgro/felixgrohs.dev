@@ -182,7 +182,8 @@ footer.grid-cell {
 		padding: var(--horizontal-padding-header) var(--vertical-padding);
 		color: var(--tooltip-header);
 
-		& .stack {
+		/* Stack */
+		& ul {
 			display: flex;
 			align-items: center;
 			& img {
@@ -214,7 +215,8 @@ footer.grid-cell {
 		background: var(--tooltip-footer-bg);
 		z-index: 1;
 
-		& .actions {
+		/* Actions */
+		& form {
 		}
 
 		& nav {

@@ -57,8 +57,9 @@ export const supportsPassive = (): boolean => {
 /**
  * 
  */
-export const catchFocusIn = (parent: HTMLElement, eventCallback: (e: Event) => void): HTMLButtonElement => {
+export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: (e: Event) => void): HTMLButtonElement => {
     const catchElement = document.createElement('button');
+    catchElement.innerText = label;
     addStylesTo(catchElement, {
         position: 'relative',
         overflow: 'hidden',
@@ -107,10 +108,12 @@ export const blurAndCall = (e: Event, fn: (...args: any[]) => any) => {
     fn.call({}, e);
 }
 
-export const trapFocus = (container: Element): {
-    trap(): void,
-    untrap(): void
-} => {
+export interface FocusTrap {
+    trap(): void;
+    untrap(): void;
+}
+
+export const trapFocus = (container: Element): FocusTrap => {
     const outsiders: Element[] = [];
     const defaultFocusables = [
         "input",

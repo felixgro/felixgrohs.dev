@@ -15,7 +15,7 @@ export interface Project {
 **/
 export const createContainer = (): HTMLDivElement => {
     const container = document.createElement('div');
-    container.className = 'sub-container no-select';
+    container.className = 'sub-container';
 
     addProjectsTo(container);
 
