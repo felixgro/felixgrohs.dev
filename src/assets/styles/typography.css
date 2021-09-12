@@ -1,4 +1,4 @@
-#app {
+body {
 	font-family: Lato, Avenir, Helvetica, Arial, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -39,7 +39,7 @@
 
 		&.intro {
 			font-size: clamp(17px, 1.7vw, 22px);
-			max-width: 450px;
+			max-width: 500px;
 			width: 80%;
 		}
 	}

@@ -1,3 +1,5 @@
+import { supportsPassive } from './dom';
+
 interface Position {
 	x: number;
 	y: number;
@@ -51,3 +53,31 @@ export const swipeable = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeCont
 		}
 	};
 }
+
+export const toggleClientScrolling = (el: HTMLElement, withKeys = false) => {
+	const keyCodes = { ArrowLeft: 1, ArrowRight: 1, ArrowUp: 1, ArrowDown: 1 };
+	const wheelEvent = 'onwheel' in el ? 'wheel' : 'mousewheel';
+	const hasPassive = supportsPassive();
+
+	const preventDefault = (e: Event) => e.preventDefault();
+	const preventDefaultKeys = (e: KeyboardEvent) => e.code in keyCodes && e.preventDefault();
+
+	return {
+		disable: () => {
+			el.addEventListener('DOMMouseScroll', preventDefault, false);
+			el.addEventListener(wheelEvent, preventDefault, hasPassive ? { passive: false } : false);
+			el.addEventListener('touchmove', preventDefault, hasPassive ? { passive: false } : false);
+
+			if (withKeys) window.addEventListener('keydown', preventDefaultKeys, hasPassive ? { passive: false } : false);
+			return this;
+		},
+		enable: () => {
+			el.removeEventListener('DOMMouseScroll', preventDefault, false);
+			el.removeEventListener(wheelEvent, preventDefault);
+			el.removeEventListener('touchmove', preventDefault);
+
+			if (withKeys) window.removeEventListener('keydown', preventDefaultKeys);
+			return this;
+		}
+	}
+};

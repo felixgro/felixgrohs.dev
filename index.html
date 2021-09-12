@@ -51,45 +51,11 @@
 		</main>
 
 		<aside class="projects-container grid-cell">
-			<a href="#" class="focus-catch hidden">Portfolio</a>
-			<div class="projects-cover" aria-hidden="true">
-				<div class="left-cover"></div>
-				<div class="right-cover"></div>
-			</div>
-			<div class="projects no-scrollbar" aria-hidden="true"></div>
+			<span class="fallback">
+				Visit me on <a href="https://github.com/felixgro">Github</a> for a selection of my
+				projects.
+			</span>
 		</aside>
-
-		<div class="project-tooltip" aria-hidden="true">
-			<header>
-				<h3>Project Title</h3>
-				<div class="stack">
-					<img class="js" src="./src/assets/icons/js.svg" alt="Javascript Icon" aria-hidden="true">
-					<img class="ts" src="./src/assets/icons/ts.svg" alt="Typescript Icon" aria-hidden="true">
-					<img class="vue" src="./src/assets/icons/vue.svg" alt="Vue.js Icon" aria-hidden="true">
-				</div>
-			</header>
-			<p></p>
-			<footer>
-				<div class="actions">
-					<button class="close"></button>
-					<button class="backward"></button>
-					<button class="forward"></button>
-				</div>
-				<nav>
-					<a href="#" target="_blank" class="source">
-						Source
-					</a>
-					<a href="#" target="_blank" class="preview">
-						<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 75 100" class="svg-triangle" viewport=""
-							height="10" width="10">
-							<polygon points="0,0 0,100 75,50" />
-						</svg>
-						Preview
-					</a>
-				</nav>
-			</footer>
-			<div class="triangle-down"></div>
-		</div>
 
 		<footer class="grid-cell">
 			<span></span>
@@ -153,6 +119,12 @@
 
 		<canvas class="animated-grid"></canvas>
 	</div>
+
+	<script>
+		// Remove Fallbacks
+		const fallbacks = document.querySelectorAll('.fallback');
+		fallbacks.forEach(fb => fb.remove());
+	</script>
 
 	<script type="module" src="/src/main.ts"></script>
 </body>

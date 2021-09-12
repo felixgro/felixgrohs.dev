@@ -1,38 +1,54 @@
 import { getProject, Project } from './ProjectFactory';
-import { startScrolling } from './ProjectScroller';
-import { trapFocus, blurAndCall } from '../utils/dom';
-import { debounce } from '../utils/functions';
+import { startScrolling, getNeighbor } from './ProjectScroller';
+import { trapFocus, FocusTrap } from '../utils/dom';
 import { addStylesTo } from '../utils/css';
-import swipe, { Swipe } from '../utils/swipe';
 import { on } from '../utils/events';
 
-const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
-    title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
-    description = tooltip.querySelector<HTMLParagraphElement>('p')!,
-    stack = tooltip.querySelector<HTMLDivElement>('div.stack')!,
-    source = tooltip.querySelector<HTMLAnchorElement>('a.source')!,
-    preview = tooltip.querySelector<HTMLAnchorElement>('a.preview')!,
-    buttonBackward = tooltip.querySelector<HTMLButtonElement>('button.backward')!,
-    buttonEscape = tooltip.querySelector<HTMLButtonElement>('button.close')!,
-    buttonForward = tooltip.querySelector<HTMLButtonElement>('button.forward')!,
-    duration = 200; // Duration for tooltip animation in ms
 
-let swiper: Swipe,
-    currentProject: HTMLAnchorElement | null,
-    focusTrap = trapFocus(tooltip),
-    bgElement: HTMLDivElement,
+const duration = 200; // Duration for tooltip animation in ms
+
+
+let tooltip: HTMLDivElement,
+    heading: HTMLHeadingElement,
+    description: HTMLParagraphElement,
+    stack: HTMLUListElement,
+    source: HTMLAnchorElement,
+    preview: HTMLAnchorElement,
+    focusTrap: FocusTrap,
+    bgLayer: HTMLDivElement,
     isOpen = false;
 
+
+export const initProjectTooltip = () => {
+    createProjectTooltip();
+    focusTrap = trapFocus(tooltip);
+
+    on('pre-resize', closeTooltip);
+
+    on('key-Left', () => {
+        if (!isOpen) return;
+        gotoPrevious();
+    });
+
+    on('key-Right', () => {
+        if (!isOpen) return;
+        gotoNext();
+    });
+
+    on('key-Escape', () => {
+        if (!isOpen) return;
+        startScrolling();
+        closeTooltip();
+    });
+}
+
+
 /**
- * Displays a new project within the tooltip.
- * 
- * @param a - project's clicked anchor element
+ * Display a project within the tooltip.
  */
 export const displayProject = (a: HTMLAnchorElement) => {
     const project = getProject(a.innerText);
     if (!project) return;
-
-    currentProject = a;
 
     if (isOpen) {
         switchTo(project);
@@ -44,7 +60,7 @@ export const displayProject = (a: HTMLAnchorElement) => {
 
 
 /**
- * Positionates & opens tooltip if it's currently closed.
+ * Positionate & open tooltip if it's currently closed.
  */
 export const openTooltip = () => {
     if (isOpen) return;
@@ -70,13 +86,12 @@ export const openTooltip = () => {
     });
 
     addClickableBackground();
-    swiper.start();
     focusTrap.trap();
 };
 
 
 /**
- * Closes tooltip, and starts autoscrolling afterwards.
+ * Close tooltip, and start animated scrolling afterwards.
  */
 export const closeTooltip = () => {
     if (!isOpen) return;
@@ -99,7 +114,6 @@ export const closeTooltip = () => {
     setTimeout(() => tooltip.style.display = 'none', duration);
 
     removeClickableBackground();
-    swiper.stop();
     focusTrap.untrap();
     startScrolling();
 };
@@ -111,7 +125,7 @@ export const closeTooltip = () => {
 export const gotoNext = () => {
     if (!isOpen) return;
 
-    const next = getRightNeighbor();
+    const next = getNeighbor('right');
     if (next) next.click();
 }
 
@@ -122,60 +136,16 @@ export const gotoNext = () => {
 export const gotoPrevious = () => {
     if (!isOpen) return;
 
-    const prev = getLeftNeighbor();
+    const prev = getNeighbor('left');
     if (prev) prev.click();
 }
 
 
 /**
- * Get left neighbor of currently selected project.
- * 
- * @returns project element
- */
-export const getLeftNeighbor = (): HTMLAnchorElement | void => {
-    if (!isOpen) return;
-
-    const subSection = currentProject!.parentElement!;
-    let neighbor: Element;
-
-    if (subSection.firstElementChild !== currentProject!) {
-        neighbor = currentProject!.previousElementSibling!;
-    } else {
-        neighbor = subSection.previousElementSibling!.lastElementChild!;
-    }
-
-    return neighbor as HTMLAnchorElement;
-}
-
-
-/**
- * Get right neighbor of currently selected project.
- * 
- * @returns project element
- */
-export const getRightNeighbor = (): HTMLAnchorElement | void => {
-    if (!isOpen) return;
-
-    const subSection = currentProject!.parentElement!;
-    let neighbor: Element;
-
-    if (subSection.lastElementChild !== currentProject!) {
-        neighbor = currentProject!.nextElementSibling!;
-    } else {
-        neighbor = subSection.nextElementSibling!.firstElementChild!;
-    }
-
-    return neighbor as HTMLAnchorElement;
-}
-
-
-/**
- * Updates tooltip's data to match the selected project.
- * 
- * @param project
+ * Update tooltip's data to match a newly selected project.
  */
 const assignProjectToTooltip = (project: Project) => {
-    title.innerText = project.title;
+    heading.innerText = project.title;
     description.innerText = project.description
     source.href = project.repo;
     preview.href = project.url;
@@ -202,8 +172,6 @@ const assignProjectToTooltip = (project: Project) => {
 
 /**
  * Smoothly animate height to fit new project within tooltip.
- * 
- * @param project 
  */
 const switchTo = (project: Project) => {
     const curHeight = tooltip.clientHeight;
@@ -233,51 +201,75 @@ const switchTo = (project: Project) => {
  * Adds full width & height background layer which auto closes tooltip on click.
  */
 const addClickableBackground = () => {
-    bgElement = document.createElement('div');
-    addStylesTo(bgElement, {
-        position: 'fixed',
-        inset: 0,
+    if (!bgLayer) {
+        bgLayer = document.createElement('div');
+        addStylesTo(bgLayer, {
+            position: 'fixed',
+            inset: 0,
+        });
+
+        bgLayer.onclick = closeTooltip;
+        document.body.appendChild(bgLayer);
+    }
+
+    addStylesTo(bgLayer, {
         zIndex: 100
     });
-
-    bgElement.onclick = closeTooltip;
-    document.body.appendChild(bgElement);
 }
 
 
 /**
- * Removes background layer.
+ * Hide background layer.
  */
 const removeClickableBackground = () => {
-    bgElement.remove();
+    addStylesTo(bgLayer, {
+        zIndex: -1
+    });
 }
 
 
 /**
- * Registration of client events for convenient usage
+ * Create tooltip markup and assign to dom.
  */
-on('resize', debounce(closeTooltip, { timeout: 500 }));
+export const createProjectTooltip = () => {
+    tooltip = document.createElement('div');
+    tooltip.className = 'project-tooltip';
+    tooltip.setAttribute('aria-hidden', 'true');
 
-buttonForward.onclick = (e) => blurAndCall(e, gotoNext);
-buttonBackward.onclick = (e) => blurAndCall(e, gotoPrevious);
-buttonEscape.onclick = (e) => blurAndCall(e, closeTooltip);
+    const header = document.createElement('header');
+    heading = document.createElement('h3');
+    stack = document.createElement('ul');
+    header.appendChild(heading);
+    header.appendChild(stack);
+    tooltip.appendChild(header);
 
-on('key-Left', () => {
-    if (!isOpen) return;
-    gotoPrevious();
-});
+    description = document.createElement('p');
+    tooltip.appendChild(description);
 
-on('key-Right', () => {
-    if (!isOpen) return;
-    gotoNext();
-});
+    const footer = document.createElement('footer');
+    const actions = document.createElement('form');
 
-on('key-Escape', () => {
-    if (!isOpen) return;
-    startScrolling();
-    closeTooltip();
-});
+    const nav = document.createElement('nav');
+    source = nav.appendChild(document.createElement('a'));
+    source.href = '#';
+    source.rel = 'noreferrer';
+    source.innerText = 'Source';
+    source.className = 'source';
+    source.target = '_blank';
+    preview = nav.appendChild(document.createElement('a'));
+    preview.href = '#';
+    preview.rel = 'noreferrer';
+    preview.innerText = 'Preview';
+    preview.className = 'preview';
+    preview.target = '_blank';
 
-swiper = swipe(document.querySelector('.projects')!)
-    .onLeft(gotoNext)
-    .onRight(gotoPrevious);
+    footer.appendChild(actions);
+    footer.appendChild(nav);
+    tooltip.appendChild(footer);
+
+    const triangle = document.createElement('div');
+    triangle.className = 'triangle-down';
+    tooltip.appendChild(triangle);
+
+    document.body.appendChild(tooltip);
+};
