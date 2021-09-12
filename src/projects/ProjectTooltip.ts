@@ -1,22 +1,50 @@
-import { getProject, getTech, Project } from './ProjectFactory';
-import { startScrolling } from './ProjectScroller';
+import { getProject, Project } from './ProjectFactory';
+import { startScrolling, getNeighbor } from './ProjectScroller';
+import { trapFocus, FocusTrap } from '../utils/dom';
+import { addStylesTo } from '../utils/css';
+import { on } from '../utils/events';
 
-const tooltip = document.querySelector<HTMLDivElement>('.project-tooltip')!,
-    title = tooltip.querySelector<HTMLHeadingElement>('h3')!,
-    description = tooltip.querySelector<HTMLParagraphElement>('p')!,
-    stack = tooltip.querySelector<HTMLDivElement>('div.stack')!,
-    source = tooltip.querySelector<HTMLAnchorElement>('a.source')!,
-    preview = tooltip.querySelector<HTMLAnchorElement>('a.preview')!,
-    closeButton = tooltip.querySelector<HTMLButtonElement>('.close-tooltip')!,
-    duration = 200;
 
-let bgElement: HTMLDivElement,
+const duration = 200; // Duration for tooltip animation in ms
+
+
+let tooltip: HTMLDivElement,
+    heading: HTMLHeadingElement,
+    description: HTMLParagraphElement,
+    stack: HTMLUListElement,
+    source: HTMLAnchorElement,
+    preview: HTMLAnchorElement,
+    focusTrap: FocusTrap,
+    bgLayer: HTMLDivElement,
     isOpen = false;
 
+
+export const initProjectTooltip = () => {
+    createProjectTooltip();
+    focusTrap = trapFocus(tooltip);
+
+    on('pre-resize', closeTooltip);
+
+    on('key-Left', () => {
+        if (!isOpen) return;
+        gotoPrevious();
+    });
+
+    on('key-Right', () => {
+        if (!isOpen) return;
+        gotoNext();
+    });
+
+    on('key-Escape', () => {
+        if (!isOpen) return;
+        startScrolling();
+        closeTooltip();
+    });
+}
+
+
 /**
- * Displays a new project within the tooltip.
- * 
- * @param a - project's clicked anchor element
+ * Display a project within the tooltip.
  */
 export const displayProject = (a: HTMLAnchorElement) => {
     const project = getProject(a.innerText);
@@ -30,82 +58,9 @@ export const displayProject = (a: HTMLAnchorElement) => {
     }
 };
 
-/**
- * Updates tooltip's data to match the selected project.
- * 
- * @param project
- */
-const assignProjectToTooltip = (project: Project) => {
-    title.innerText = project.title;
-    description.innerText = project.description
-    source.href = project.repo;
-    preview.href = project.url;
-
-    stack.innerHTML = '';
-    for (const t of project.stack) {
-        const tech = getTech(t)
-        if (!tech) continue;
-
-        const badge = document.createElement('div');
-        badge.className = 'badge';
-        badge.innerText = tech.short;
-        badge.style.background = tech.color;
-        stack.appendChild(badge);
-    }
-};
 
 /**
- * Smoothly animate height to fit new project within tooltip.
- * 
- * @param project 
- */
-const switchTo = (project: Project) => {
-    let curHeight = tooltip.clientHeight;
-
-    assignProjectToTooltip(project);
-
-    tooltip.style.height = 'auto';
-    let newHeight = tooltip.getBoundingClientRect().height;
-    tooltip.style.height = `${curHeight}px`;
-
-    tooltip.animate([
-        {
-            height: `${curHeight}px`
-        }, {
-            height: `${newHeight}px`
-        }
-    ], {
-        duration,
-        easing: 'ease-out'
-    });
-
-    tooltip.style.height = `auto`;
-};
-
-/**
- * Adds full width & height background layer which auto closes tooltip on click.
- */
-const addClickableBackground = () => {
-    bgElement = document.createElement('div');
-    Object.assign(bgElement.style, {
-        position: 'fixed',
-        inset: 0,
-        'z-index': 100,
-    });
-
-    bgElement.onclick = closeTooltip;
-    document.body.appendChild(bgElement);
-}
-
-/**
- * Removes background layer.
- */
-const removeClickableBackground = () => {
-    bgElement.remove();
-}
-
-/**
- * Positionates & opens tooltip if it's currently closed.
+ * Positionate & open tooltip if it's currently closed.
  */
 export const openTooltip = () => {
     if (isOpen) return;
@@ -131,10 +86,12 @@ export const openTooltip = () => {
     });
 
     addClickableBackground();
+    focusTrap.trap();
 };
 
+
 /**
- * Closes tooltip, and starts autoscrolling afterwards.
+ * Close tooltip, and start animated scrolling afterwards.
  */
 export const closeTooltip = () => {
     if (!isOpen) return;
@@ -157,7 +114,162 @@ export const closeTooltip = () => {
     setTimeout(() => tooltip.style.display = 'none', duration);
 
     removeClickableBackground();
+    focusTrap.untrap();
     startScrolling();
 };
 
-closeButton.onclick = closeTooltip;
+
+/**
+ * Jump to next project.
+ */
+export const gotoNext = () => {
+    if (!isOpen) return;
+
+    const next = getNeighbor('right');
+    if (next) next.click();
+}
+
+
+/**
+ * Jump to previous project.
+ */
+export const gotoPrevious = () => {
+    if (!isOpen) return;
+
+    const prev = getNeighbor('left');
+    if (prev) prev.click();
+}
+
+
+/**
+ * Update tooltip's data to match a newly selected project.
+ */
+const assignProjectToTooltip = (project: Project) => {
+    heading.innerText = project.title;
+    description.innerText = project.description
+    source.href = project.repo;
+    preview.href = project.url;
+
+    for (let i = 0; i < stack.children.length; i++) {
+        const tech = stack.children[i] as HTMLElement;
+
+        if (project.stack.includes(tech.className)) {
+            // show tech if not visible
+            if (tech.getAttribute('aria-hidden') === 'true') {
+                tech.style.display = 'block';
+                tech.setAttribute('aria-hidden', 'false');
+            }
+        } else {
+            // hide tech if still visible
+            if (tech.getAttribute('aria-hidden') === 'false') {
+                tech.style.display = 'none';
+                tech.setAttribute('aria-hidden', 'true');
+            }
+        }
+    }
+};
+
+
+/**
+ * Smoothly animate height to fit new project within tooltip.
+ */
+const switchTo = (project: Project) => {
+    const curHeight = tooltip.clientHeight;
+
+    assignProjectToTooltip(project);
+
+    tooltip.style.height = 'auto';
+    let newHeight = tooltip.getBoundingClientRect().height;
+    tooltip.style.height = `${curHeight}px`;
+
+    tooltip.animate([
+        {
+            height: `${curHeight}px`
+        }, {
+            height: `${newHeight}px`
+        }
+    ], {
+        duration,
+        easing: 'ease-out'
+    });
+
+    tooltip.style.height = `auto`;
+};
+
+
+/**
+ * Adds full width & height background layer which auto closes tooltip on click.
+ */
+const addClickableBackground = () => {
+    if (!bgLayer) {
+        bgLayer = document.createElement('div');
+        addStylesTo(bgLayer, {
+            position: 'fixed',
+            inset: 0,
+        });
+
+        bgLayer.onclick = closeTooltip;
+        document.body.appendChild(bgLayer);
+    }
+
+    addStylesTo(bgLayer, {
+        zIndex: 100
+    });
+}
+
+
+/**
+ * Hide background layer.
+ */
+const removeClickableBackground = () => {
+    addStylesTo(bgLayer, {
+        zIndex: -1
+    });
+}
+
+
+/**
+ * Create tooltip markup and assign to dom.
+ */
+export const createProjectTooltip = () => {
+    tooltip = document.createElement('div');
+    tooltip.className = 'project-tooltip';
+    tooltip.setAttribute('aria-hidden', 'true');
+
+    const header = document.createElement('header');
+    heading = document.createElement('h3');
+    stack = document.createElement('ul');
+    header.appendChild(heading);
+    header.appendChild(stack);
+    tooltip.appendChild(header);
+
+    description = document.createElement('p');
+    tooltip.appendChild(description);
+
+    const footer = document.createElement('footer');
+    const actions = document.createElement('form');
+
+    const nav = document.createElement('nav');
+    source = nav.appendChild(document.createElement('a'));
+    source.href = '#';
+    source.rel = 'noreferrer';
+    source.innerText = 'Source';
+    source.className = 'source';
+    source.target = '_blank';
+    preview = nav.appendChild(document.createElement('a'));
+    preview.href = '#';
+    preview.rel = 'noreferrer';
+    preview.innerText = 'Preview';
+    preview.className = 'preview';
+    preview.target = '_blank';
+
+    footer.appendChild(actions);
+    footer.appendChild(nav);
+    tooltip.appendChild(footer);
+
+    const triangle = document.createElement('div');
+    triangle.className = 'triangle-down';
+    tooltip.appendChild(triangle);
+
+    document.body.appendChild(tooltip);
+};

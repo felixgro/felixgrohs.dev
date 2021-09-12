@@ -1,221 +1,265 @@
-import { createContainer, onProjectClick } from './ProjectFactory';
-import { displayProject, closeTooltip } from './ProjectTooltip';
+import { createContainer } from './ProjectFactory';
+import { initProjectTooltip, displayProject } from './ProjectTooltip';
+import { toggleClientScrolling } from '../utils/gestures';
+import { catchFocusIn, addGradientCoverTo, scrollHorizontal } from '../utils/dom';
 import { on } from '../utils/events';
-import debounce from '../utils/debounce';
+
 
 const scrollSpeed = .9,
-	centeringFactor = .9,
-	debounceTime = 150;
+	distanceFactor = 1.7, // distance multiplicator for appending/prepending on client interaction
+	marginFactor = 1.5, // gets multiplied with innerWidth for margin
+	marginMin = 800;
 
-let currentProject: HTMLAnchorElement | null,
-	parentContainer: HTMLDivElement,
+
+type ScrollState = 'scrolling' | 'centering' | 'idling';
+
+
+let parentContainer: HTMLDivElement,
+	currentProject: HTMLAnchorElement | null,
+	scrollContainer: HTMLDivElement,
+	scrollFrame: DOMRect,
 	firstContainer: HTMLDivElement,
 	lastContainer: HTMLDivElement,
-	parentBcr: DOMRect,
-	currentScroll = 0,
-	currentFrame = 0,
-	isScrolling = false,
-	isCentering = false,
-	margin = window.innerWidth * 1.5;
+	subContainers: NodeListOf<Element>,
+	animationFrameId: number,
+	scrollState: ScrollState = 'idling',
+	margin: number, // min scroll distance in each direction
+	scrolledDistance = 0, // tracks total distance on client interaction
+	currentScroll = 0; // current scroll position
+
 
 /**
- * Initialize by filling the parent with all configured projects, assign variables and start auto scrolling.
+ * Initialize by filling parent container with all configured projects, assign variables and start auto scrolling.
  */
-export default () => {
-	parentContainer = document.querySelector('.projects')!;
-	parentBcr = parentContainer.getBoundingClientRect();
+export const initProjectScroller = () => {
+	parentContainer = document.querySelector('.projects-container')!;
 
-	onProjectClick(debounce((e: Event) => {
+	// create scroll container..
+	scrollContainer = document.createElement('div');
+	scrollContainer.setAttribute('class', 'projects no-scrollbar no-select');
+	scrollContainer.setAttribute('aria-hidden', 'true');
+	parentContainer.appendChild(scrollContainer);
+
+	// add gradient cover..
+	const gradientColor = getComputedStyle(document.querySelector('#app')!).backgroundColor;
+	addGradientCoverTo(parentContainer, gradientColor);
+
+	// listen for these events..
+	on('post-resize', () => {
+		scrollFrame = scrollContainer.getBoundingClientRect();
+		margin = innerWidth * marginFactor;
+		if (margin < marginMin) margin = marginMin;
+	}, { immediately: true });
+
+	on('visible', () => {
+		if (!currentProject) startScrolling();
+	});
+
+	on('invisible', () => {
+		stopScrolling();
+	});
+
+	// listen for tab-moved focus on scroll container..
+	catchFocusIn(parentContainer, 'Selection of Projects', (e: Event) => {
 		e.preventDefault();
+		subContainers = document.querySelectorAll('.sub-container');
+		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLAnchorElement).click();
+	});
 
-		const project = e.target as HTMLAnchorElement;
-		if (project !== currentProject) centerProject(project);
-	}, debounceTime));
+	// disable all kind of default scroll behaviours and create tooltip for project preview..
+	toggleClientScrolling(scrollContainer, true).disable();
+	initProjectTooltip();
 
-	fillParentContainer();
-	firstContainer = parentContainer.firstElementChild as HTMLDivElement;
-	lastContainer = parentContainer.lastElementChild as HTMLDivElement;
+	// fill parent with projects and start scrolling!
+	generateProjects();
 	startScrolling();
-
-	parentContainer.ontouchmove = (e: Event) => e.preventDefault();
-	parentContainer.onscroll = (e: Event) => e.preventDefault();
-
-	on('resize', debounce(closeTooltip, 500))
-
-	on('resize', debounce(() => {
-		margin = window.innerWidth * 1.5;
-		parentBcr = parentContainer.getBoundingClientRect();
-	}, 500, {
-		leading: false,
-		trailing: true
-	}));
 }
 
-/**
-* Appends a new container in parent.
-* 
-* @returns new container
-*/
-export const appendContainer = (): HTMLDivElement => {
-	lastContainer = createContainer();
-	parentContainer.appendChild(lastContainer);
-
-	return lastContainer;
-}
 
 /**
- * Removes first container from parent.
- * 
- */
-export const shiftContainer = () => {
-	const width = firstContainer.clientWidth;
-
-	firstContainer.remove();
-	firstContainer = parentContainer.firstElementChild as HTMLDivElement;
-
-	currentScroll -= width;
-	parentContainer.scrollLeft = currentScroll;
-}
-
-/**
- * Prepends a new container in parent.
- * 
- * @returns new container
- */
-export const prependContainer = (): HTMLDivElement => {
-	firstContainer = createContainer();
-	parentContainer.prepend(firstContainer);
-
-	currentScroll += firstContainer.clientWidth;
-	parentContainer.scrollLeft = currentScroll;
-
-	return firstContainer;
-}
-
-/**
- * Removes last container from parent.
- */
-export const popContainer = () => {
-	lastContainer.remove();
-	lastContainer = parentContainer.lastElementChild as HTMLDivElement;
-}
-
-/**
- * Animation loop for auto scrolling.
- */
-const scrollAnimationFrame = () => {
-	if (!isScrolling) return;
-	currentFrame = window.requestAnimationFrame(scrollAnimationFrame);
-
-	currentScroll += scrollSpeed;
-	parentContainer.scrollLeft = currentScroll;
-
-	const firstBcr = firstContainer.getBoundingClientRect();
-	const lastBcr = lastContainer.getBoundingClientRect();
-
-	if (firstBcr.x + firstBcr.width < margin * -1) shiftContainer();
-	if (lastBcr.x + lastBcr.width < currentScroll + margin) appendContainer();
-	if (lastBcr.x > currentScroll + margin) popContainer();
-}
-
-/**
- * Starts auto scrolling.
+ * Start animated scrolling if it's not running.
  */
 export const startScrolling = () => {
-	if (isScrolling) return;
+	if (scrollState === 'scrolling' || scrollState === 'centering') return;
+	scrollState = 'scrolling';
+
 	if (currentProject) {
 		currentProject.classList.remove('active');
 		currentProject = null;
 	}
-	isScrolling = true;
-	currentScroll = parentContainer.scrollLeft;
-	currentFrame = window.requestAnimationFrame(scrollAnimationFrame);
+
+	currentScroll = scrollContainer.scrollLeft;
+	animationFrameId = requestAnimationFrame(scrollAnimationFrame);
 }
 
+
 /**
- * Stops auto scrolling.
+ * Stop animated scrolling if it's running.
  */
 export const stopScrolling = () => {
-	if (!isScrolling) return;
-	isScrolling = false;
-	window.cancelAnimationFrame(currentFrame);
+	if (scrollState === 'centering' || scrollState === 'idling') return;
+	scrollState = 'idling';
+
+	cancelAnimationFrame(animationFrameId);
 }
 
+
 /**
- * Fills all available space (including specified margin) within parent using sub-containers and
- * subsequently centers the scroll position horizontally to enable seamless scrolling in both directions.
+ * Get either left or right neighbor of currently selected project.
  */
-const fillParentContainer = () => {
-	let currentWidth = parentBcr.x;
+export const getNeighbor = (dir: 'left' | 'right'): HTMLAnchorElement | void => {
+	if (!currentProject) return;
+	const subSection = currentProject.parentElement!;
+
+	let neighbor: Element;
+
+	if (dir === 'left') {
+		neighbor = (subSection.firstElementChild !== currentProject! ?
+			currentProject.previousElementSibling! :
+			subSection.previousElementSibling!.lastElementChild!);
+	} else {
+		neighbor = subSection.lastElementChild !== currentProject! ?
+			currentProject!.nextElementSibling! :
+			subSection.nextElementSibling!.firstElementChild!;
+	}
+
+	return neighbor as HTMLAnchorElement;
+}
+
+
+/**
+ * Eventlistener for click event in each subcontainer.
+ */
+const onContainerClick = (e: Event) => {
+	const target = e.target as HTMLAnchorElement;
+
+	if (target.classList.contains('project-anchor') && target !== currentProject)
+		centerProject(target);
+}
+
+
+/**
+* Move first subcontainer at end of scroll container.
+*/
+const appendContainer = (): void => {
+	lastContainer = shiftContainer();
+	scrollContainer.appendChild(lastContainer);
+}
+
+
+/**
+ * Move last container at the beginning of scroll container.
+ */
+const prependContainer = (): void => {
+	firstContainer = popContainer();
+	scrollContainer.prepend(firstContainer);
+	currentScroll += firstContainer.clientWidth;
+	scrollContainer.scrollLeft = currentScroll;
+}
+
+
+/**
+ * Remove & return first container from parent without affecting current scroll position.
+ */
+const shiftContainer = (): HTMLDivElement => {
+	const prevContainer = firstContainer;
+	firstContainer.remove();
+	firstContainer = scrollContainer.firstElementChild as HTMLDivElement;
+	currentScroll -= firstContainer.clientWidth;
+	scrollContainer.scrollLeft = currentScroll;
+	return prevContainer;
+}
+
+
+/**
+ * Remove & return last container from parent.
+ */
+const popContainer = (): HTMLDivElement => {
+	const prevContainer = lastContainer;
+	lastContainer.remove();
+	lastContainer = scrollContainer.lastElementChild as HTMLDivElement;
+	return prevContainer;
+}
+
+
+/**
+ * Main Loop for animated scrolling.
+ */
+const scrollAnimationFrame = () => {
+	if (scrollState !== 'scrolling') return;
+	animationFrameId = requestAnimationFrame(scrollAnimationFrame);
+
+	currentScroll += scrollSpeed;
+	scrollContainer.scrollLeft = currentScroll;
+
+	const lastBcr = lastContainer.getBoundingClientRect();
+	if (lastBcr.x + lastBcr.width < currentScroll + margin * 0.2)
+		appendContainer();
+}
+
+
+/**
+ * Fill all available space (including specified margin) within parent with subcontainers and
+ * subsequently center the scroll position horizontally to enable seamless client scrolling in both directions.
+ */
+const generateProjects = () => {
+	let currentWidth = 0;
+
+	const generateProjectsContainer = (): HTMLDivElement => {
+		const projects = createContainer();
+		projects.onclick = onContainerClick;
+		scrollContainer.appendChild(projects);
+		currentWidth += projects.clientWidth;
+		return projects;
+	};
+
+	firstContainer = generateProjectsContainer();
 
 	do {
-		const subContainer = appendContainer();
-		currentWidth += subContainer.clientWidth;
+		lastContainer = generateProjectsContainer();
+	} while (currentWidth < scrollFrame.width + scrollFrame.x + margin);
 
-	} while (currentWidth < parentBcr.width + margin);
-
-	currentScroll = margin;
-	parentContainer.scrollLeft = currentScroll;
+	currentScroll = (scrollContainer.scrollWidth - scrollFrame.width) / 2;
+	scrollContainer.scrollLeft = currentScroll;
 }
 
-/**
- * Animates horizontal scroll by given amount in pixels.
- * This replaces `element.scrollBy({ left: amount, behaviour: 'smooth' })`
- * due to no support on safari.
- * 
- * @param amount 
- */
-const scrollBy = (amount: number) => {
-	return new Promise((resolve) => {
-		const start = currentScroll,
-			time = Math.abs(amount * centeringFactor),
-			step = amount / 100;
-
-		let currTime = 0,
-			index = 0;
-
-		const scrollStep = (i: number, step: number, start: number) =>
-			parentContainer.scrollLeft = (i * step) + start;
-
-		while (currTime <= time) {
-			setTimeout(scrollStep, currTime, index, step, start);
-			currTime += time / 100;
-			index++;
-		}
-
-		setTimeout(() => {
-			currentScroll += amount;
-			resolve(true);
-		}, currTime);
-	});
-}
 
 /**
- * Scrolls smoothly through parent container in order to center
- * specified project.
- * 
- * @param projectElement 
+ * Smoothly animate scroll in scroll container to center the given project.
  */
 const centerProject = (projectElement: HTMLAnchorElement) => {
-	if (isCentering) return;
-	isCentering = true;
+	if (scrollState === 'centering') return;
 	stopScrolling();
-
-	const bcr = projectElement.getBoundingClientRect(),
-		rawDiff = (bcr.width / 2 + bcr.left) - (parentBcr.width / 2 + parentBcr.left),
-		conDiff = rawDiff / parentContainer.firstElementChild!.clientWidth,
-		conDiffRounded = conDiff >= 0 ? Math.ceil(conDiff) : Math.floor(conDiff);
+	scrollState = 'centering';
 
 	if (currentProject) currentProject.classList.remove('active');
 	currentProject = projectElement;
 	currentProject.classList.add('active');
 
-	scrollBy(rawDiff).then(() => {
-		displayProject(projectElement);
+	const bcr = projectElement.getBoundingClientRect(),
+		containerWidth = firstContainer.clientWidth,
+		rawDiff = (bcr.width / 2 + bcr.left) - (scrollFrame.width / 2 + scrollFrame.left);
 
-		for (let i = 0; i < Math.abs(conDiffRounded); i++) {
-			(conDiffRounded < 0) ? prependContainer() : appendContainer();
+	scrollHorizontal(scrollContainer, {
+		from: currentScroll,
+		to: rawDiff,
+		speed: scrollSpeed
+	}).then(() => {
+		currentScroll += rawDiff;
+		scrolledDistance += rawDiff;
+
+		// swap containers to create an illusion of 'infinite' scrolling..
+		for (let i = Math.abs(scrolledDistance) * distanceFactor; i > containerWidth; i -= containerWidth) {
+			if (scrolledDistance > 0) {
+				appendContainer();
+				scrolledDistance -= containerWidth;
+			} else {
+				prependContainer();
+				scrolledDistance += containerWidth;
+			}
 		}
-		isCentering = false;
+
+		displayProject(projectElement);
+		scrollState = 'idling';
 	});
 };

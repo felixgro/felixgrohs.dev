@@ -1,24 +1,52 @@
-type Callback = (...args: any[]) => void;
+import { debounce } from '../utils/functions';
 
-const events: {
-    [title: string]: Callback[]
-} = {};
+type EventCallback = (...args: any[]) => void;
 
-window.onload = (e: Event) => fire('load', e);
-window.onresize = (e: Event) => fire('resize', e);
+type EventCallbackOptions = {
+    immediately?: boolean
+}
 
-export const on = (event: string, fn: Callback) => {
-    if (hasEvent(event)) {
-        events[event].push(fn);
-    } else {
+const events: { [title: string]: EventCallback[] } = {};
+
+export const on = (event: string, fn: EventCallback, config?: EventCallbackOptions) => {
+    if (config?.immediately) fn.call({});
+
+    hasEvent(event) ?
+        events[event].push(fn) :
         events[event] = [fn];
-    }
 }
 
 export const fire = (event: string, ...payload: any[]) => {
-    if (!hasEvent(event)) return;
-
-    for (const fn of events[event]) fn.call({}, ...payload);
+    hasEvent(event) && events[event].forEach(cb => cb.call({}, ...payload));
 }
 
-const hasEvent = (event: string): boolean => event in events;
+export const hasEvent = (event: string): boolean => event in events;
+
+export const registerDefaultEvents = () => {
+    window.addEventListener('load', (e: Event) => fire('load', e));
+
+    // TODO: Remove!
+    window.addEventListener('resize', (e: UIEvent) => fire('resize', e));
+
+    document.addEventListener('visibilitychange', (e: Event) => {
+        if (document.visibilityState === 'hidden') {
+            fire('invisible', e);
+        } else {
+            fire('visible', e);
+        }
+    });
+
+    const timeout = 500; // debounce timeout for pre & post resize events
+    window.addEventListener('resize', debounce((e: UIEvent) => fire('pre-resize', e), { leading: true, trailing: false, timeout }));
+    window.addEventListener('resize', debounce((e: UIEvent) => fire('post-resize', e), { leading: false, trailing: true, timeout }));
+
+    window.addEventListener('keydown', debounce((e: KeyboardEvent) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+            fire('key-Left', e);
+        } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+            fire('key-Right', e);
+        } else {
+            fire(`key-${e.code}`, e);
+        }
+    }));
+}

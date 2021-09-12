@@ -1,10 +1,4 @@
-const lines: Line[] = [],
-    lineWidth = 2,
-    lineColor = '#e1e1e1';
-
-let canvas: HTMLCanvasElement,
-    ctx: CanvasRenderingContext2D,
-    canvasBcr: DOMRect;
+import { on } from './events';
 
 enum Position {
     Top,
@@ -12,6 +6,14 @@ enum Position {
     Bottom,
     Left
 }
+
+const lines: Line[] = [],
+    lineWidth = 2,
+    lineColor = 'hsl(241, 16%, 15%)';
+
+let canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    canvasBcr: DOMRect;
 
 class Line {
     constructor(
@@ -58,7 +60,7 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
 
     ctx = canvas.getContext('2d')!;
 
-    // todo: automatically create lines without duplication
+    // TODO: automatically create lines without duplication
     lines.push(new Line(canvas, Position.Top));
     lines.push(new Line(canvas, Position.Left));
     lines.push(new Line(canvas, Position.Right));
@@ -67,11 +69,14 @@ export default (c: HTMLCanvasElement, cellElements: NodeList) => {
     lines.push(new Line(cellElements[1] as Element, Position.Bottom));
     lines.push(new Line(cellElements[3] as Element, Position.Top));
 
-    // draw lines
+    // draw all lines
     for (const line of lines) line.draw(ctx);
+
+    // redraw grid when window resizes..
+    on('resize', redrawGrid);
 }
 
-export const reDraw = () => {
+const redrawGrid = () => {
     canvas.height = canvas.clientHeight;
     canvas.width = canvas.clientWidth;
     canvasBcr = canvas.getBoundingClientRect();
