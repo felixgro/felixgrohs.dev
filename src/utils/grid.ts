@@ -8,7 +8,7 @@ enum Position {
 }
 
 const lines: Line[] = [],
-    lineWidth = 2,
+    lineWidth = 4,
     lineColor = 'hsl(241, 16%, 15%)';
 
 let canvas: HTMLCanvasElement,
