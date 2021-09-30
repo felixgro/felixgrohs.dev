@@ -1,10 +1,12 @@
 import type { Project } from './ProjectFactory';
 import type { FocusTrapControls } from '../utils/dom';
+import type { SwipeController } from '../utils/gestures';
 import type { SwappableText, SwappableAnimationConfig } from '../utils/motion';
 
 import { getProject } from './ProjectFactory';
 import { startScrolling, getNeighbor } from './ProjectScroller';
 import { trapFocus, newTabAnchor, setVisibility, onClickOutsideOf, appendChildren } from '../utils/dom';
+import { swipeable } from '../utils/gestures';
 import { swappable } from '../utils/motion';
 import { on } from '../utils/events';
 
@@ -18,6 +20,7 @@ let scrollContainer: HTMLDivElement,
     source: HTMLAnchorElement,
     preview: HTMLAnchorElement,
     focusTrap: FocusTrapControls,
+    swipeCntrl: SwipeController,
     isOpen = false;
 
 let title: SwappableText,
@@ -26,8 +29,13 @@ let title: SwappableText,
 
 export const initProjectTooltip = () => {
     createProjectTooltip();
+
     focusTrap = trapFocus(tooltip);
     scrollContainer = document.querySelector('.projects-container')!;
+    swipeCntrl = swipeable(scrollContainer, {
+        right: gotoPrevious,
+        left: gotoNext
+    });
 
     on('post-resize', () => {
         scrollBcr = scrollContainer.getBoundingClientRect();
@@ -79,6 +87,7 @@ export const openTooltip = () => {
         duration: ANIM_DURATION,
         fill: 'forwards',
     }).addEventListener('finish', () => {
+        swipeCntrl.addListener();
         focusTrap.trap();
     });
 }
@@ -105,6 +114,7 @@ export const closeTooltip = () => {
         fill: 'forwards',
     }).addEventListener('finish', () => {
         setVisibility(false, tooltip);
+        swipeCntrl.removeListener();
         focusTrap.untrap();
     });
 

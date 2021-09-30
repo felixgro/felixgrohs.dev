@@ -1,18 +1,18 @@
 import { supportsPassive } from './browser';
 
-interface Position {
+export interface Position {
 	x: number;
 	y: number;
 }
 
-interface SwipeCallbacks {
+export interface SwipeCallbacks {
 	left?(e: TouchEvent): void;
 	right?(e: TouchEvent): void;
 	up?(e: TouchEvent): void;
 	down?(e: TouchEvent): void;
 }
 
-interface SwipeController {
+export interface SwipeController {
 	addListener(): SwipeController;
 	removeListener(): SwipeController;
 }
