@@ -5,10 +5,12 @@ body {
 
 	& .h1 {
 		font-size: clamp(90px, 8.8vw, 130px);
-		margin: 0 0 0.15em -0.07em;
-		padding-right: 50px;
+		line-height: 1;
+		margin-left: -0.07em;
+		margin: 0.2em -0.07em;
 		color: var(--txt-1);
 		font-weight: 400;
+		padding-right: 50px;
 
 		& span {
 			background: var(--main-gradient);
@@ -34,13 +36,32 @@ body {
 	}
 
 	& p {
-		font-size: clamp(18px, 1.7vw, 22px);
-		line-height: 1.5em;
+		font-size: clamp(17px, 1.7vw, 22px);
+		line-height: 1.6;
 
 		&.intro {
-			font-size: clamp(17px, 1.7vw, 22px);
-			max-width: 500px;
+			max-width: 40ch;
 			width: 80%;
+			margin-top: 0.8em;
+
+			&:first-of-type {
+				margin-top: 0;
+			}
+		}
+
+		& a {
+			text-decoration: none;
+			display: inline-block;
+			font-weight: 600;
+			padding: 5px 1px;
+			font-size: inherit;
+			transition: background 1s ease-out;
+			background: var(--main-gradient);
+			background-clip: text;
+			-webkit-background-clip: text;
+			color: transparent;
+			&:hover {
+			}
 		}
 	}
 

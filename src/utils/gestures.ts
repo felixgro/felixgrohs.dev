@@ -1,4 +1,4 @@
-import { supportsPassive } from './dom';
+import { supportsPassive } from './browser';
 
 interface Position {
 	x: number;

@@ -1,7 +1,10 @@
+import type * as CSS from 'csstype';
+
 /**
  * Add given styles to provided Element.
  */
-export const addStylesTo = (el: HTMLElement, styles: { [key: string]: any }): void => {
+export const addStylesTo = (el: HTMLElement, styles: CSS.Properties): void => {
+    if (!el?.style) throw new Error('Cannot find element to apply styles.');
     Object.assign(el.style, styles);
 }
 
@@ -54,7 +57,7 @@ export const hexToRGB = (hexString: string): string => {
 /**
  * Generates a css linear-gradient which fades from
  * provided rgb color to transparent in defined direction.
- * !This is used to prevent safari from interprating an transparent gradient as black!
+ * This is used to prevent safari from interprating an transparent gradient as black!
  */
 export const gradientToTransparent = (rgb: string, dir: string): string => {
     if (!isRGB(rgb)) throw new Error(`Cannot interpret rgb value '${rgb}'`);

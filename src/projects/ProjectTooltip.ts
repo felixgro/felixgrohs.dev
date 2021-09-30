@@ -1,45 +1,42 @@
-import { getProject, Project } from './ProjectFactory';
+import type { Project } from './ProjectFactory';
+import type { FocusTrapControls } from '../utils/dom';
+import type { SwappableText, SwappableAnimationConfig } from '../utils/motion';
+
+import { getProject } from './ProjectFactory';
 import { startScrolling, getNeighbor } from './ProjectScroller';
-import { trapFocus, FocusTrap } from '../utils/dom';
-import { addStylesTo } from '../utils/css';
+import { trapFocus, newTabAnchor, setVisibility, onClickOutsideOf, appendChildren } from '../utils/dom';
+import { swappable } from '../utils/motion';
 import { on } from '../utils/events';
 
+const ANIM_DURATION = 200,
+    ANIM_DISTANCE = 20;
 
-const duration = 200; // Duration for tooltip animation in ms
-
-
-let tooltip: HTMLDivElement,
-    heading: HTMLHeadingElement,
-    description: HTMLParagraphElement,
+let scrollContainer: HTMLDivElement,
+    scrollBcr: DOMRect,
+    tooltip: HTMLDivElement,
     stack: HTMLUListElement,
     source: HTMLAnchorElement,
     preview: HTMLAnchorElement,
-    focusTrap: FocusTrap,
-    bgLayer: HTMLDivElement,
+    focusTrap: FocusTrapControls,
     isOpen = false;
+
+let title: SwappableText,
+    description: SwappableText;
 
 
 export const initProjectTooltip = () => {
     createProjectTooltip();
     focusTrap = trapFocus(tooltip);
+    scrollContainer = document.querySelector('.projects-container')!;
 
-    on('pre-resize', closeTooltip);
+    on('post-resize', () => {
+        scrollBcr = scrollContainer.getBoundingClientRect();
+        tooltip.style.bottom = `${scrollBcr.height * 2}px`;
+    }, { immediately: true });
 
-    on('key-Left', () => {
-        if (!isOpen) return;
-        gotoPrevious();
-    });
-
-    on('key-Right', () => {
-        if (!isOpen) return;
-        gotoNext();
-    });
-
-    on('key-Escape', () => {
-        if (!isOpen) return;
-        startScrolling();
-        closeTooltip();
-    });
+    on('key-Right', gotoNext);
+    on('key-Left', gotoPrevious);
+    on('key-Escape', closeTooltip);
 }
 
 
@@ -66,10 +63,8 @@ export const openTooltip = () => {
     if (isOpen) return;
     isOpen = true;
 
-    const parentBcr = document.querySelector('.projects-container')!.getBoundingClientRect()!;
-
     tooltip.style.display = 'block';
-    tooltip.style.bottom = `${window.innerHeight - parentBcr.y + 25}px`;
+    tooltip.setAttribute('aria-hidden', 'false');
 
     tooltip.animate([
         {
@@ -81,13 +76,12 @@ export const openTooltip = () => {
             transform: 'scaleY(1) translateX(-50%)'
         }
     ], {
-        duration,
+        duration: ANIM_DURATION,
         fill: 'forwards',
+    }).addEventListener('finish', () => {
+        focusTrap.trap();
     });
-
-    addClickableBackground();
-    focusTrap.trap();
-};
+}
 
 
 /**
@@ -107,16 +101,15 @@ export const closeTooltip = () => {
             transform: 'scaleY(0) translateX(-50%)'
         }
     ], {
-        duration,
+        duration: ANIM_DURATION,
         fill: 'forwards',
+    }).addEventListener('finish', () => {
+        setVisibility(false, tooltip);
+        focusTrap.untrap();
     });
 
-    setTimeout(() => tooltip.style.display = 'none', duration);
-
-    removeClickableBackground();
-    focusTrap.untrap();
     startScrolling();
-};
+}
 
 
 /**
@@ -144,132 +137,90 @@ export const gotoPrevious = () => {
 /**
  * Update tooltip's data to match a newly selected project.
  */
-const assignProjectToTooltip = (project: Project) => {
-    heading.innerText = project.title;
-    description.innerText = project.description
+const assignProjectToTooltip = (project: Project, animate = false, direction: 'up' | 'down' = 'up') => {
+    onClickOutsideOf([tooltip, scrollContainer], closeTooltip);
     source.href = project.repo;
     preview.href = project.url;
 
-    for (let i = 0; i < stack.children.length; i++) {
-        const tech = stack.children[i] as HTMLElement;
+    const animationConfig: SwappableAnimationConfig = {
+        distance: ANIM_DISTANCE,
+        duration: ANIM_DURATION,
+        direction,
+    };
 
-        if (project.stack.includes(tech.className)) {
-            // show tech if not visible
-            if (tech.getAttribute('aria-hidden') === 'true') {
-                tech.style.display = 'block';
-                tech.setAttribute('aria-hidden', 'false');
-            }
-        } else {
-            // hide tech if still visible
-            if (tech.getAttribute('aria-hidden') === 'false') {
-                tech.style.display = 'none';
-                tech.setAttribute('aria-hidden', 'true');
-            }
-        }
-    }
-};
-
+    title.swap(project.title, animate, animationConfig);
+    description.swap(project.description, animate, animationConfig);
+}
 
 /**
  * Smoothly animate height to fit new project within tooltip.
  */
 const switchTo = (project: Project) => {
-    const curHeight = tooltip.clientHeight;
+    // get current height as animation start value..
+    const prevHeight = tooltip.clientHeight;
 
-    assignProjectToTooltip(project);
+    // get animation direction based on height difference
+    // between prev and next project description..
+    const diff = description.heightDiff(project.description),
+        direction = diff <= 0 ? 'down' : 'up';
 
-    tooltip.style.height = 'auto';
-    let newHeight = tooltip.getBoundingClientRect().height;
-    tooltip.style.height = `${curHeight}px`;
+    // animate new project content..
+    assignProjectToTooltip(project, true, direction);
 
-    tooltip.animate([
-        {
-            height: `${curHeight}px`
-        }, {
-            height: `${newHeight}px`
-        }
-    ], {
-        duration,
+    // get new height as animation height value and reset
+    // the tooltip height to it's initial value..
+    const newHeight = tooltip.getBoundingClientRect().height;
+
+    // animate smoothly from previous height to new one..
+    tooltip.animate([{
+        height: `${prevHeight}px`
+    }, {
+        height: `${newHeight}px`
+    }], {
+        duration: ANIM_DURATION,
         easing: 'ease-out'
     });
-
-    tooltip.style.height = `auto`;
-};
-
-
-/**
- * Adds full width & height background layer which auto closes tooltip on click.
- */
-const addClickableBackground = () => {
-    if (!bgLayer) {
-        bgLayer = document.createElement('div');
-        addStylesTo(bgLayer, {
-            position: 'fixed',
-            inset: 0,
-        });
-
-        bgLayer.onclick = closeTooltip;
-        document.body.appendChild(bgLayer);
-    }
-
-    addStylesTo(bgLayer, {
-        zIndex: 100
-    });
 }
 
 
 /**
- * Hide background layer.
- */
-const removeClickableBackground = () => {
-    addStylesTo(bgLayer, {
-        zIndex: -1
-    });
-}
-
-
-/**
- * Create tooltip markup and assign to dom.
+ * Create tooltip markup and it assign to the dom.
  */
 export const createProjectTooltip = () => {
+    // creates tooltip element and hides it visually and from screen readers..
     tooltip = document.createElement('div');
     tooltip.className = 'project-tooltip';
-    tooltip.setAttribute('aria-hidden', 'true');
+    setVisibility(false, tooltip);
 
+    // creates tooltip header for title and project stack..
     const header = document.createElement('header');
-    heading = document.createElement('h3');
+    title = swappable('h3');
+    title.parent.className = 'headings';
     stack = document.createElement('ul');
-    header.appendChild(heading);
-    header.appendChild(stack);
+    appendChildren(header, title.parent, stack);
     tooltip.appendChild(header);
 
-    description = document.createElement('p');
-    tooltip.appendChild(description);
+    // creates project description..
+    description = swappable('p');
+    description.parent.className = 'details';
+    tooltip.appendChild(description.parent);
 
+    // creates tooltip footer for action buttons and project urls..
     const footer = document.createElement('footer');
     const actions = document.createElement('form');
-
     const nav = document.createElement('nav');
-    source = nav.appendChild(document.createElement('a'));
-    source.href = '#';
-    source.rel = 'noreferrer';
-    source.innerText = 'Source';
+    source = nav.appendChild(newTabAnchor('Source'));
     source.className = 'source';
-    source.target = '_blank';
-    preview = nav.appendChild(document.createElement('a'));
-    preview.href = '#';
-    preview.rel = 'noreferrer';
-    preview.innerText = 'Preview';
+    preview = nav.appendChild(newTabAnchor('Preview'));
     preview.className = 'preview';
-    preview.target = '_blank';
-
-    footer.appendChild(actions);
-    footer.appendChild(nav);
+    appendChildren(footer, actions, nav);
     tooltip.appendChild(footer);
 
+    // creates small triangle pointing down..
     const triangle = document.createElement('div');
     triangle.className = 'triangle-down';
     tooltip.appendChild(triangle);
 
-    document.body.appendChild(tooltip);
-};
+    // appends tooltip within app container..
+    document.querySelector('#app')!.appendChild(tooltip);
+}

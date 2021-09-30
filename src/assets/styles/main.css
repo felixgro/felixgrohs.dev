@@ -160,7 +160,7 @@ footer.grid-cell {
 /* Project Tooltip */
 .project-tooltip {
 	display: none;
-	position: fixed;
+	position: absolute;
 	width: 85%;
 	max-width: 580px;
 	left: 50%;
@@ -194,7 +194,8 @@ footer.grid-cell {
 		}
 	}
 
-	& p {
+	& .details {
+		position: relative;
 		color: var(--tooltip-body);
 		margin-bottom: calc(var(--footer-height) * 1.05);
 		padding: 0 var(--vertical-padding) 25px var(--vertical-padding);

@@ -25,9 +25,6 @@ export const hasEvent = (event: string): boolean => event in events;
 export const registerDefaultEvents = () => {
     window.addEventListener('load', (e: Event) => fire('load', e));
 
-    // TODO: Remove!
-    window.addEventListener('resize', (e: UIEvent) => fire('resize', e));
-
     document.addEventListener('visibilitychange', (e: Event) => {
         if (document.visibilityState === 'hidden') {
             fire('invisible', e);
@@ -35,6 +32,9 @@ export const registerDefaultEvents = () => {
             fire('visible', e);
         }
     });
+
+    // TODO: Remove and completely replace by pre and post resize (line 40 - 41)
+    window.addEventListener('resize', (e: UIEvent) => fire('resize', e));
 
     const timeout = 500; // debounce timeout for pre & post resize events
     window.addEventListener('resize', debounce((e: UIEvent) => fire('pre-resize', e), { leading: true, trailing: false, timeout }));
