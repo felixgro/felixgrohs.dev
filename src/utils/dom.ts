@@ -1,8 +1,9 @@
 import { addStylesTo, gradientToTransparent } from './css';
 
+
 /**
- * Recursively iterates through all parents of specified element &
- * checks if given parent element matches one of them.
+ * Recursively iterates through all parents of specified element
+ * to check if specified parent matches one of them.
  */
 export const hasParent = (parent: Element, element: Element): boolean => {
     const currParent = element.parentElement;
@@ -11,51 +12,21 @@ export const hasParent = (parent: Element, element: Element): boolean => {
     return currParent !== null ? hasParent(parent, currParent) : false;
 }
 
-/**
- * 
- */
-export const addGradientCoverTo = (element: HTMLElement, color: string) => {
-    const coverParent = document.createElement('div');
-    addStylesTo(coverParent, {
-        position: 'absolute',
-        height: '100%',
-        width: '100%',
-        display: 'flex',
-        justifyContent: 'space-between',
-        pointerEvents: 'none',
-        zIndex: 100
-    });
 
-    for (let i = 0; i < 2; i++) {
-        const cover = document.createElement('div');
-        coverParent.appendChild(cover);
-        addStylesTo(cover, {
-            background: gradientToTransparent(color, i === 0 ? 'to right' : 'to left'),
-            width: '100px'
-        });
+/**
+ * Appends multiple children within specified dom node.
+ */
+export const appendChildren = (element: Node, ...children: Node[]) => {
+    for (let i = 0; i < children.length; i++) {
+        element.appendChild(children[i]);
     }
-
-    element.prepend(coverParent);
 }
 
-/**
- * Checks if client's browser supports passive event listeners.
- */
-export const supportsPassive = (): boolean => {
-    let supportsPassive = false;
-
-    try {
-        window.addEventListener("passive-check", () => { }, Object.defineProperty({}, 'passive', {
-            get: function () { supportsPassive = true; }
-        }));
-        window.removeEventListener("passive-check", () => { });
-    } catch (e) { }
-
-    return supportsPassive;
-}
 
 /**
- * 
+ * Catches tab-moved focus within specified parent element by injecting & returning an invisible button element
+ * which executes the given eventCallback function whenever a focus event occurs.
+ * Label is necessary to support screen-readers or any other assistive technologies.
  */
 export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: (e: Event) => void): HTMLButtonElement => {
     const catchElement = document.createElement('button');
@@ -68,10 +39,12 @@ export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: 
         width: 0,
     });
 
-    catchElement.addEventListener('focus', eventCallback, { passive: false });
-    parent.appendChild(catchElement);
-    return catchElement;
+    // assign focus event listener..
+    catchElement.addEventListener('focus', eventCallback);
+
+    return parent.appendChild(catchElement);
 }
+
 
 /**
  * Animates horizontal scroll by given amount in pixels.
@@ -98,22 +71,50 @@ export const scrollHorizontal = (parent: HTMLElement, config: { from: number, to
     });
 }
 
-export const blurAndCall = (e: Event, fn: (...args: any[]) => any) => {
-    let target = e.target as HTMLElement;
-    if (!target) return;
 
-    if (target.tagName === 'svg') target = target.parentElement!;
-    e.preventDefault();
-    target.blur();
-    fn.call({}, e);
+/**
+ * Add horizontal gradient cover on specified element,
+ * which fades away from specified color.
+ */
+export const addGradientCoverTo = (element: HTMLElement, color: string) => {
+    const coverParent = document.createElement('div');
+    addStylesTo(coverParent, {
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'space-between',
+        pointerEvents: 'none',
+        zIndex: 100
+    });
+
+    for (let i = 0; i < 2; i++) {
+        const cover = document.createElement('div');
+        coverParent.appendChild(cover);
+        addStylesTo(cover, {
+            background: gradientToTransparent(color, i === 0 ? 'to right' : 'to left'),
+            width: '100px'
+        });
+    }
+
+    element.prepend(coverParent);
 }
 
-export interface FocusTrap {
+
+/**
+ * Traps focus within a specified node, by modifying the tabindex
+ * on each individual focusable element in the whole document.
+ */
+export interface FocusTrapControls {
     trap(): void;
     untrap(): void;
 }
 
-export const trapFocus = (container: Element): FocusTrap => {
+/**
+ * Trap focus within given container.
+ */
+export const trapFocus = (container: Element): FocusTrapControls => {
+    // all elements that are not related to specified container..
     const outsiders: Element[] = [];
     const defaultFocusables = [
         "input",
@@ -134,4 +135,54 @@ export const trapFocus = (container: Element): FocusTrap => {
         trap: () => outsiders.forEach(el => el.setAttribute('tabindex', '-1')),
         untrap: () => outsiders.forEach(el => el.removeAttribute('tabindex'))
     }
+}
+
+/**
+ * Creates an anchor element which opens within a new tab.
+ */
+export const newTabAnchor = (label: string, ref = '#'): HTMLAnchorElement => {
+    const a = document.createElement('a');
+    a.href = ref;
+    a.innerText = label;
+    a.target = '_blank';
+    a.rel = 'noreferrer';
+    return a;
+}
+
+/**
+ * Toggle visibility of specified elements.
+ */
+export const setVisibility = (visible: boolean, el: HTMLElement, visually = false) => {
+    el.setAttribute('aria-hidden', `${!visible}`);
+
+    if (!visually) return;
+
+    addStylesTo(el, {
+        opacity: visible ? 1 : 0,
+    });
+}
+
+/**
+ * Excludes or includes specified elements from layout flow.
+ */
+export const setFlow = (dir: 'include' | 'exclude', ...elements: HTMLElement[]) => {
+    for (const element of elements) {
+        addStylesTo(element, {
+            position: dir === 'exclude' ? 'absolute' : 'relative',
+        });
+    }
+}
+
+export const onClickOutsideOf = (elements: Element[], cb: (e: Event) => void) => {
+    window.addEventListener('click', (e: Event) => {
+        const target = e.target as Element;
+        if (!target) return;
+
+        let isOutside = true;
+        for (let i = 0; i < elements.length; i++) {
+            if (hasParent(elements[i], target)) isOutside = false;
+        }
+
+        if (isOutside) cb.call({}, e);
+    }, { once: true });
 }

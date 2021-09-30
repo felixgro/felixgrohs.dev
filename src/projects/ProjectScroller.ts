@@ -7,7 +7,7 @@ import { on } from '../utils/events';
 
 const scrollSpeed = .9,
 	distanceFactor = 1.7, // distance multiplicator for appending/prepending on client interaction
-	marginFactor = 1.5, // gets multiplied with innerWidth for margin
+	marginFactor = 2, // gets multiplied with innerWidth for margin
 	marginMin = 800;
 
 
@@ -60,8 +60,7 @@ export const initProjectScroller = () => {
 	});
 
 	// listen for tab-moved focus on scroll container..
-	catchFocusIn(parentContainer, 'Selection of Projects', (e: Event) => {
-		e.preventDefault();
+	catchFocusIn(parentContainer, 'Selection of Projects', () => {
 		subContainers = document.querySelectorAll('.sub-container');
 		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLAnchorElement).click();
 	});

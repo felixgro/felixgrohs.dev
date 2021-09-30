@@ -37,13 +37,16 @@ body {
 
 	& p {
 		font-size: clamp(17px, 1.7vw, 22px);
-		max-width: 40ch;
-		width: 80%;
 		line-height: 1.6;
-		margin-top: 0.8em;
 
-		&:first-of-type {
-			margin-top: 0;
+		&.intro {
+			max-width: 40ch;
+			width: 80%;
+			margin-top: 0.8em;
+
+			&:first-of-type {
+				margin-top: 0;
+			}
 		}
 
 		& a {
