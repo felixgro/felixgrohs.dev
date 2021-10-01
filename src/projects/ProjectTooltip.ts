@@ -10,21 +10,22 @@ import { swipeable } from '../utils/gestures';
 import { swappable } from '../utils/motion';
 import { on } from '../utils/events';
 
+
 const ANIM_DURATION = 200,
     ANIM_DISTANCE = 20;
+
 
 let scrollContainer: HTMLDivElement,
     scrollBcr: DOMRect,
     tooltip: HTMLDivElement,
+    title: SwappableText,
+    description: SwappableText,
     stack: HTMLUListElement,
     source: HTMLAnchorElement,
     preview: HTMLAnchorElement,
     focusTrap: FocusTrapControls,
     swipeCntrl: SwipeController,
     isOpen = false;
-
-let title: SwappableText,
-    description: SwappableText;
 
 
 export const initProjectTooltip = () => {
@@ -197,7 +198,7 @@ const switchTo = (project: Project) => {
  * Create tooltip markup and it assign to the dom.
  */
 export const createProjectTooltip = () => {
-    // creates tooltip element and hides it visually and from screen readers..
+    // creates tooltip element and hides it from screen readers..
     tooltip = document.createElement('div');
     tooltip.className = 'project-tooltip';
     setVisibility(false, tooltip);
@@ -206,14 +207,14 @@ export const createProjectTooltip = () => {
     const header = document.createElement('header');
     title = swappable('h3');
     title.parent.className = 'headings';
+    title.parent.firstElementChild!.id = 'projectTitle';
     stack = document.createElement('ul');
     appendChildren(header, title.parent, stack);
-    tooltip.appendChild(header);
 
     // creates project description..
     description = swappable('p');
     description.parent.className = 'details';
-    tooltip.appendChild(description.parent);
+    description.parent.firstElementChild!.id = 'projectDescription';
 
     // creates tooltip footer for action buttons and project urls..
     const footer = document.createElement('footer');
@@ -224,12 +225,18 @@ export const createProjectTooltip = () => {
     preview = nav.appendChild(newTabAnchor('Preview'));
     preview.className = 'preview';
     appendChildren(footer, actions, nav);
-    tooltip.appendChild(footer);
 
     // creates small triangle pointing down..
     const triangle = document.createElement('div');
     triangle.className = 'triangle-down';
-    tooltip.appendChild(triangle);
+
+    // append everything within tooltip..
+    appendChildren(tooltip, header, description.parent, footer, triangle);
+
+    // aria stuff..
+    tooltip.setAttribute('role', 'dialog');
+    tooltip.setAttribute('aria-labelledby', 'projectTitle');
+    tooltip.setAttribute('aria-describedby', 'projectDescription');
 
     // appends tooltip within app container..
     document.querySelector('#app')!.appendChild(tooltip);
