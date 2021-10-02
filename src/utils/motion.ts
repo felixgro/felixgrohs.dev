@@ -1,15 +1,15 @@
 import { appendChildren, setVisibility, setFlow } from './dom';
 
-export interface SwappableText {
-    parent: HTMLDivElement;
-    swap: (txt: string, shouldAnimate?: boolean, config?: SwappableAnimationConfig) => void;
-    heightDiff: (txt: string) => number;
-}
-
-export interface SwappableAnimationConfig {
+export interface AnimationConfig {
     direction: 'up' | 'down';
     distance: number;
     duration: number;
+}
+
+export interface SwappableText {
+    parent: HTMLDivElement;
+    swap: (txt: string, shouldAnimate?: boolean, config?: AnimationConfig) => void;
+    heightDiff: (txt: string) => number;
 }
 
 export const swappable = (tag: string): SwappableText => {
@@ -34,7 +34,7 @@ export const swappable = (tag: string): SwappableText => {
         },
 
         // Swaps current text out with new one, which can happen immediately or animated.
-        swap: (txt: string, shouldAnimate = false, config?: SwappableAnimationConfig): void => {
+        swap: (txt: string, shouldAnimate = false, config?: AnimationConfig): void => {
             if (!shouldAnimate || !config) {
                 primaryEl.innerText = txt;
                 return;

@@ -24,6 +24,16 @@ export const appendChildren = (element: Node, ...children: Node[]) => {
 
 
 /**
+ * Removes all children from specified parent node.
+ */
+export const removeChildren = (parent: Node) => {
+    while (parent.lastChild) {
+        parent.removeChild(parent.lastChild);
+    }
+}
+
+
+/**
  * Catches tab-moved focus within specified parent element by injecting & returning an invisible button element
  * which executes the given eventCallback function whenever a focus event occurs.
  * Label is necessary to support screen-readers or any other assistive technologies.

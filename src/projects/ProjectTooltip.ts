@@ -1,13 +1,15 @@
 import type { Project } from './ProjectFactory';
+import type { StackList } from './StackList';
 import type { FocusTrapControls } from '../utils/dom';
 import type { SwipeController } from '../utils/gestures';
-import type { SwappableText, SwappableAnimationConfig } from '../utils/motion';
+import type { SwappableText, AnimationConfig } from '../utils/motion';
 
 import { getProject } from './ProjectFactory';
 import { startScrolling, getNeighbor } from './ProjectScroller';
 import { trapFocus, newTabAnchor, setVisibility, onClickOutsideOf, appendChildren } from '../utils/dom';
-import { swipeable } from '../utils/gestures';
+import { createStackList } from './StackList';
 import { swappable } from '../utils/motion';
+import { swipe } from '../utils/gestures';
 import { on } from '../utils/events';
 
 
@@ -19,8 +21,8 @@ let scrollContainer: HTMLDivElement,
     scrollBcr: DOMRect,
     tooltip: HTMLDivElement,
     title: SwappableText,
+    stackList: StackList,
     description: SwappableText,
-    stack: HTMLUListElement,
     source: HTMLAnchorElement,
     preview: HTMLAnchorElement,
     focusTrap: FocusTrapControls,
@@ -33,7 +35,7 @@ export const initProjectTooltip = () => {
 
     focusTrap = trapFocus(tooltip);
     scrollContainer = document.querySelector('.projects-container')!;
-    swipeCntrl = swipeable(scrollContainer, {
+    swipeCntrl = swipe(scrollContainer, {
         right: gotoPrevious,
         left: gotoNext
     });
@@ -153,7 +155,7 @@ const assignProjectToTooltip = (project: Project, animate = false, direction: 'u
     source.href = project.repo;
     preview.href = project.url;
 
-    const animationConfig: SwappableAnimationConfig = {
+    const animationConfig: AnimationConfig = {
         distance: ANIM_DISTANCE,
         duration: ANIM_DURATION,
         direction,
@@ -161,6 +163,7 @@ const assignProjectToTooltip = (project: Project, animate = false, direction: 'u
 
     title.swap(project.title, animate, animationConfig);
     description.swap(project.description, animate, animationConfig);
+    stackList.setStack(project.stack, animate, animationConfig);
 }
 
 /**
@@ -208,8 +211,8 @@ export const createProjectTooltip = () => {
     title = swappable('h3');
     title.parent.className = 'headings';
     title.parent.firstElementChild!.id = 'projectTitle';
-    stack = document.createElement('ul');
-    appendChildren(header, title.parent, stack);
+    stackList = createStackList();
+    appendChildren(header, title.parent, stackList.element);
 
     // creates project description..
     description = swappable('p');

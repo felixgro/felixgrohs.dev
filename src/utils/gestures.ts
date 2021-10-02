@@ -17,7 +17,7 @@ export interface SwipeController {
 	removeListener(): SwipeController;
 }
 
-export const swipeable = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeController => {
+export const swipe = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeController => {
 	let startPos: Position | null = null;
 
 	const handleTouchStart = (e: TouchEvent) => {
@@ -42,8 +42,8 @@ export const swipeable = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeCont
 
 	return {
 		addListener() {
-			el.addEventListener('touchstart', handleTouchStart);
-			el.addEventListener('touchmove', handleTouchMove);
+			el.addEventListener('touchstart', handleTouchStart, { passive: false });
+			el.addEventListener('touchmove', handleTouchMove, { passive: false });
 			return this;
 		},
 		removeListener() {
