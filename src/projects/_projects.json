@@ -25,7 +25,7 @@
 		"url": "https://fractal-visualizer.netlify.app/",
 		"repo": "https://github.com/felixgro/fractal-visualizer",
 		"description": "This project demonstrates an artistic side of math by generating and redrawing fractals based on user defined variables.",
-		"stack": ["Vue", "JS", "HTML5"]
+		"stack": ["Vue", "JS", "HTML5", "CSS3"]
 	},
 	{
 		"title": "custcur",

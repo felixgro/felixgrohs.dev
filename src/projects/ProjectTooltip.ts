@@ -45,6 +45,10 @@ export const initProjectTooltip = () => {
         tooltip.style.bottom = `${scrollBcr.height * 2}px`;
     }, { immediately: true });
 
+
+    // TODO: Inform screenreaders of keyboard shortcuts
+    // https://www.w3schools.com/tags/att_global_accesskey.asp
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaKeyShortcuts
     on('key-Right', gotoNext);
     on('key-Left', gotoPrevious);
     on('key-Escape', closeTooltip);
@@ -90,8 +94,10 @@ export const openTooltip = () => {
         duration: ANIM_DURATION,
         fill: 'forwards',
     }).addEventListener('finish', () => {
-        swipeCntrl.addListener();
-        focusTrap.trap();
+        swipeCntrl.addListener(); focusTrap.trap();
+
+        const escpBtn = document.querySelector('.project-tooltip form')!.firstElementChild! as HTMLButtonElement;
+        escpBtn.focus();
     });
 }
 
@@ -222,6 +228,33 @@ export const createProjectTooltip = () => {
     // creates tooltip footer for action buttons and project urls..
     const footer = document.createElement('footer');
     const actions = document.createElement('form');
+
+    const prevBtn = document.createElement('button'),
+        nextBtn = document.createElement('button'),
+        escpBtn = document.createElement('button');
+
+    // TODO: Add aria labels and replace buttons with icons
+    prevBtn.innerText = 'prev';
+    nextBtn.innerText = 'next';
+    escpBtn.innerText = 'escp';
+
+    appendChildren(actions, escpBtn, prevBtn, nextBtn);
+
+    // TODO: EXCLUDE
+    const eventListener = (e: Event) => {
+        e.preventDefault();
+
+        // TODO: change button to svg and get title by a different attribute
+        switch ((e.target as HTMLElement).innerText) {
+            case 'next': return gotoNext();
+            case 'prev': return gotoPrevious();
+            case 'escp': return closeTooltip();
+        }
+    }
+
+    [escpBtn, prevBtn, nextBtn].forEach(btn => btn.addEventListener('click', eventListener));
+    // END EXCLUDE
+
     const nav = document.createElement('nav');
     source = nav.appendChild(newTabAnchor('Source'));
     source.className = 'source';

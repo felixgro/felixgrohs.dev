@@ -50,7 +50,7 @@ export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: 
     });
 
     // assign focus event listener..
-    catchElement.addEventListener('focus', eventCallback);
+    catchElement.addEventListener('click', eventCallback);
 
     return parent.appendChild(catchElement);
 }
