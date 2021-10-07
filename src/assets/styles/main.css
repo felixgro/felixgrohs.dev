@@ -11,7 +11,7 @@ body {
 #app {
 	position: relative;
 	display: grid;
-	grid-template-rows: 75px 1fr auto 35px;
+	grid-template-rows: 75px 1fr auto 25px;
 	background: var(--bg-app);
 
 	height: 100%;
@@ -83,7 +83,7 @@ footer.grid-cell {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 0 20px;
+	padding: 0 5px;
 
 	& nav ul {
 		display: flex;
@@ -165,45 +165,50 @@ footer.grid-cell {
 	max-width: 580px;
 	left: 50%;
 	transform: translateX(-50%);
-	border-radius: 10px;
+	border-radius: 28px;
 	transform-origin: bottom center;
 	background: var(--tooltip-bg);
 	box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.05);
 	z-index: 200;
 
-	--horizontal-padding-header: clamp(17px, 3.4vw, 20px);
-	--vertical-padding: clamp(1px, 3.6vw, 25px);
-	--footer-height: clamp(56px, 3.4vw, 80px);
+	--vertical-padding: 30px;
+	--footer-height: 51px;
 
 	& header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: var(--horizontal-padding-header) var(--vertical-padding);
+		padding: 32px var(--vertical-padding);
 		color: var(--tooltip-header);
+
+		& h3:focus {
+			outline: none;
+		}
 
 		/* Stack */
 		& ul {
 			display: flex;
 			align-items: center;
+			gap: 6px;
+			margin: 0;
+			right: 0;
 			& img {
-				height: 16px;
-				margin-right: 5px;
-				display: none;
+				height: 20px;
+				width: 20px;
 			}
 		}
 	}
 
-	& .details {
+	& p {
 		position: relative;
 		color: var(--tooltip-body);
 		margin-bottom: calc(var(--footer-height) * 1.05);
-		padding: 0 var(--vertical-padding) 25px var(--vertical-padding);
+		padding: 0 var(--vertical-padding) 40px var(--vertical-padding);
 	}
 
 	& footer {
 		position: absolute;
-		padding: 0 var(--vertical-padding);
+		padding: 10px;
 		height: var(--footer-height);
 		width: 100%;
 		bottom: 0;
@@ -213,6 +218,7 @@ footer.grid-cell {
 		border-radius: inherit;
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
+		border-top: 1px solid var(--tooltip-footer-border);
 		background: var(--tooltip-footer-bg);
 		z-index: 1;
 
@@ -232,10 +238,12 @@ footer.grid-cell {
 				transition: color 120ms ease-out;
 				overflow: hidden;
 
+				border-radius: 4px;
+
 				&.preview {
 					background: var(--tooltip-preview-bg);
 					color: var(--tooltip-preview);
-					border-radius: 6px;
+					border-radius: 4px 4px 16px 4px;
 					margin-left: 8px;
 					padding: clamp(3px, 3vw, 8px) clamp(7px, 3vw, 12px);
 

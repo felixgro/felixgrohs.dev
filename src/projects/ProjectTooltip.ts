@@ -1,39 +1,58 @@
 import type { Project } from './ProjectFactory';
-import type { FocusTrapControls } from '../utils/dom';
-import type { SwappableText, SwappableAnimationConfig } from '../utils/motion';
+import type { StackList } from './StackList';
+import type { FocusTrapControls, ClickOutsideEventControls } from '../utils/dom';
+import type { SwipeController } from '../utils/gestures';
+import type { SwappableText, AnimationConfig } from '../utils/motion';
 
 import { getProject } from './ProjectFactory';
 import { startScrolling, getNeighbor } from './ProjectScroller';
-import { trapFocus, newTabAnchor, setVisibility, onClickOutsideOf, appendChildren } from '../utils/dom';
+import { trapFocus, newTabAnchor, setVisibility, onClickOutsideOf } from '../utils/dom';
+import { createStackList } from './StackList';
 import { swappable } from '../utils/motion';
+import { swipe } from '../utils/gestures';
 import { on } from '../utils/events';
+
 
 const ANIM_DURATION = 200,
     ANIM_DISTANCE = 20;
 
+
 let scrollContainer: HTMLDivElement,
     scrollBcr: DOMRect,
     tooltip: HTMLDivElement,
-    stack: HTMLUListElement,
+    title: SwappableText,
+    stackList: StackList,
+    description: SwappableText,
     source: HTMLAnchorElement,
     preview: HTMLAnchorElement,
     focusTrap: FocusTrapControls,
+    swipeCntrl: SwipeController,
+    clickOutsideHandler: ClickOutsideEventControls,
     isOpen = false;
-
-let title: SwappableText,
-    description: SwappableText;
 
 
 export const initProjectTooltip = () => {
     createProjectTooltip();
-    focusTrap = trapFocus(tooltip);
+
     scrollContainer = document.querySelector('.projects-container')!;
+    clickOutsideHandler = onClickOutsideOf([tooltip, scrollContainer], closeTooltip);
+    focusTrap = trapFocus(tooltip, '#projectTitle');
+    swipeCntrl = swipe(scrollContainer, {
+        right: gotoPrevious,
+        left: gotoNext
+    });
+
 
     on('post-resize', () => {
+        closeTooltip();
         scrollBcr = scrollContainer.getBoundingClientRect();
         tooltip.style.bottom = `${scrollBcr.height * 2}px`;
     }, { immediately: true });
 
+
+    // TODO: Inform screenreaders of keyboard shortcuts
+    // https://www.w3schools.com/tags/att_global_accesskey.asp
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaKeyShortcuts
     on('key-Right', gotoNext);
     on('key-Left', gotoPrevious);
     on('key-Escape', closeTooltip);
@@ -79,6 +98,8 @@ export const openTooltip = () => {
         duration: ANIM_DURATION,
         fill: 'forwards',
     }).addEventListener('finish', () => {
+        clickOutsideHandler.listen();
+        swipeCntrl.addListener();
         focusTrap.trap();
     });
 }
@@ -105,7 +126,9 @@ export const closeTooltip = () => {
         fill: 'forwards',
     }).addEventListener('finish', () => {
         setVisibility(false, tooltip);
+        swipeCntrl.removeListener();
         focusTrap.untrap();
+        clickOutsideHandler.unlisten();
     });
 
     startScrolling();
@@ -138,11 +161,10 @@ export const gotoPrevious = () => {
  * Update tooltip's data to match a newly selected project.
  */
 const assignProjectToTooltip = (project: Project, animate = false, direction: 'up' | 'down' = 'up') => {
-    onClickOutsideOf([tooltip, scrollContainer], closeTooltip);
     source.href = project.repo;
     preview.href = project.url;
 
-    const animationConfig: SwappableAnimationConfig = {
+    const animationConfig: AnimationConfig = {
         distance: ANIM_DISTANCE,
         duration: ANIM_DURATION,
         direction,
@@ -150,6 +172,7 @@ const assignProjectToTooltip = (project: Project, animate = false, direction: 'u
 
     title.swap(project.title, animate, animationConfig);
     description.swap(project.description, animate, animationConfig);
+    stackList.setStack(project.stack, animate, animationConfig);
 }
 
 /**
@@ -187,40 +210,52 @@ const switchTo = (project: Project) => {
  * Create tooltip markup and it assign to the dom.
  */
 export const createProjectTooltip = () => {
-    // creates tooltip element and hides it visually and from screen readers..
-    tooltip = document.createElement('div');
-    tooltip.className = 'project-tooltip';
-    setVisibility(false, tooltip);
+    // creates tooltip element and hides it from screen readers..
+    tooltip = document.querySelector('.project-tooltip')!;
 
     // creates tooltip header for title and project stack..
-    const header = document.createElement('header');
-    title = swappable('h3');
-    title.parent.className = 'headings';
-    stack = document.createElement('ul');
-    appendChildren(header, title.parent, stack);
-    tooltip.appendChild(header);
+    const titleElement = document.querySelector<HTMLHeadingElement>('#projectTitle')!;
+    const descriptionElement = document.querySelector<HTMLParagraphElement>('#projectDescription')!;
+    const stackListElement = document.querySelector<HTMLParagraphElement>('.stacklist')!;
 
-    // creates project description..
-    description = swappable('p');
-    description.parent.className = 'details';
-    tooltip.appendChild(description.parent);
+    title = swappable(titleElement);
+    description = swappable(descriptionElement);
+    stackList = createStackList(stackListElement);
 
     // creates tooltip footer for action buttons and project urls..
     const footer = document.createElement('footer');
     const actions = document.createElement('form');
+
+    const prevBtn = document.querySelector<HTMLButtonElement>('.tooltip-action-previous')!,
+        nextBtn = document.querySelector<HTMLButtonElement>('.tooltip-action-next')!,
+        escpBtn = document.querySelector<HTMLButtonElement>('.tooltip-action-escape')!;
+
+    // TODO: EXCLUDE
+    const eventListener = (e: Event) => {
+        e.preventDefault();
+
+        // TODO: change button to svg and get title by a different attribute
+        switch ((e.target as HTMLElement).innerText) {
+            case 'next': return gotoNext();
+            case 'prev': return gotoPrevious();
+            case 'escp': return closeTooltip();
+        }
+    }
+
+    [escpBtn, prevBtn, nextBtn].forEach(btn => btn.addEventListener('click', eventListener));
+    // END EXCLUDE
+
     const nav = document.createElement('nav');
     source = nav.appendChild(newTabAnchor('Source'));
     source.className = 'source';
     preview = nav.appendChild(newTabAnchor('Preview'));
     preview.className = 'preview';
-    appendChildren(footer, actions, nav);
-    tooltip.appendChild(footer);
+    // appendChildren(footer, actions, nav);
 
     // creates small triangle pointing down..
     const triangle = document.createElement('div');
     triangle.className = 'triangle-down';
-    tooltip.appendChild(triangle);
 
-    // appends tooltip within app container..
-    document.querySelector('#app')!.appendChild(tooltip);
+    // append everything within tooltip..
+    // appendChildren(tooltip, header, description.parent, footer, triangle);
 }

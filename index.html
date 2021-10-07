@@ -8,6 +8,9 @@
 		content="I'm a certified fullstack Webdeveloper with a passion for clean user interfaces & motion design.">
 
 	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+
+	<link rel="preload" href="./src/assets/fonts/Lato-Regular.ttf" as="font" type="font/ttf" crossorigin>
+	<link rel="preload" href="./src/assets/fonts/Lato-Bold.ttf" as="font" type="font/ttf" crossorigin>
 	<link rel="stylesheet" href="./src/assets/styles/main.css">
 
 	<title>Felix Grohs - Fullstack Webdeveloper - felixgrohs.dev</title>
@@ -19,9 +22,8 @@
 <body class="dark">
 	<div id="app">
 
-
 		<header class="grid-cell">
-			<svg aria-label="Personal Logo Icon" class="logo" viewBox="0 0 172 254" width="30px" height="30px">
+			<svg aria-label="Personal Logo" role="img" class="logo" viewBox="0 0 172 254" width="30px" height="30px">
 				<path
 					d="M102.4,186.79L71.4,201.28C75.962,218.202 78.902,235.52 80.18,253C103.899,240.444 113.742,211.113 102.4,186.79Z" />
 				<path
@@ -38,7 +40,6 @@
 			</nav>
 		</header>
 
-
 		<main class="grid-cell">
 			<article>
 				<h1 class="h1">I’m <span>Felix Grohs.</span></h1>
@@ -53,7 +54,6 @@
 			</article>
 		</main>
 
-
 		<aside class="projects-container grid-cell">
 			<noscript>
 				<span>
@@ -63,14 +63,34 @@
 			</noscript>
 		</aside>
 
+		<div class="project-tooltip" role="dialog" aria-hidden="true" aria-labelledby="projectTitle"
+			aria-describedby="projectDescription">
+			<header>
+				<h3 id="projectTitle" tabindex="-1"></h3>
+				<div class="stacklist" aria-label="Used technologies"></div>
+			</header>
+
+			<p id="projectDescription"></p>
+
+			<footer>
+				<form>
+					<button aria-label="Quit projects dialog" class="tooltip-action-escape">Escape</button>
+					<button aria-label="Goto previous project" class="tooltip-action-previous">Previous</button>
+					<button aria-label="Goto next project" class="tooltip-action-next">Next</button>
+				</form>
+				<nav>
+					<a href="#" class="source">Source</a>
+					<a href="#" class="preview">Preview</a>
+				</nav>
+			</footer>
+
+			<div class="triangle-down"></div>
+		</div>
 
 		<footer class="grid-cell">
-			<span></span>
-			<nav></nav>
 		</footer>
 
-
-		<canvas class="animated-grid"></canvas>
+		<canvas aria-label="Animated Grid Lines" class="animated-grid"></canvas>
 	</div>
 </body>
 

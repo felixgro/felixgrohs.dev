@@ -5,11 +5,20 @@ import { addStylesTo, gradientToTransparent } from './css';
  * Recursively iterates through all parents of specified element
  * to check if specified parent matches one of them.
  */
-export const hasParent = (parent: Element, element: Element): boolean => {
+export const hasParent = (parent: Node, element: Node): boolean => {
     const currParent = element.parentElement;
     if (currParent === parent) return true;
 
     return currParent !== null ? hasParent(parent, currParent) : false;
+}
+
+
+/**
+ * Wraps a new parent node around another node which results in a new dom hirachy.
+ */
+export const wrap = (child: Node, parent: Node): void => {
+    child.parentNode?.insertBefore(parent, child);
+    parent.appendChild(child);
 }
 
 
@@ -24,11 +33,24 @@ export const appendChildren = (element: Node, ...children: Node[]) => {
 
 
 /**
- * Catches tab-moved focus within specified parent element by injecting & returning an invisible button element
- * which executes the given eventCallback function whenever a focus event occurs.
- * Label is necessary to support screen-readers or any other assistive technologies.
+ * Removes all children from specified parent node.
  */
-export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: (e: Event) => void): HTMLButtonElement => {
+export const removeChildren = (parent: Node) => {
+    while (parent.lastChild) {
+        parent.removeChild(parent.lastChild);
+    }
+}
+
+
+/**
+ * Catches tab-moved focus within specified parent element by injecting an invisible
+ * button element in specified parent, which executes the given
+ * eventCallback function whenever a click event occurs & returns the injected Button.
+ * 
+ * Label is necessary to support screen-readers: assistive technologies read out the label
+ * as soon as the focus is moved inside the given parent.
+ */
+export const catchFocusIn = (parent: Node, label: string, eventCallback: (e: Event) => void): HTMLButtonElement => {
     const catchElement = document.createElement('button');
     catchElement.innerText = label;
     addStylesTo(catchElement, {
@@ -39,9 +61,7 @@ export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: 
         width: 0,
     });
 
-    // assign focus event listener..
-    catchElement.addEventListener('focus', eventCallback);
-
+    catchElement.addEventListener('click', eventCallback);
     return parent.appendChild(catchElement);
 }
 
@@ -49,6 +69,7 @@ export const catchFocusIn = (parent: HTMLElement, label: string, eventCallback: 
 /**
  * Animates horizontal scroll by given amount in pixels.
  * This polyfills `element.scrollBy({ left: number, behaviour: 'smooth' })` due to no support in safari.
+ * TODO: Exclude to motion.ts file.
  */
 export const scrollHorizontal = (parent: HTMLElement, config: { from: number, to: number, speed: number }): Promise<never> => {
     return new Promise((resolve) => {
@@ -75,6 +96,7 @@ export const scrollHorizontal = (parent: HTMLElement, config: { from: number, to
 /**
  * Add horizontal gradient cover on specified element,
  * which fades away from specified color.
+ * TODO: Exclude to css.ts file!
  */
 export const addGradientCoverTo = (element: HTMLElement, color: string) => {
     const coverParent = document.createElement('div');
@@ -110,10 +132,10 @@ export interface FocusTrapControls {
     untrap(): void;
 }
 
-/**
- * Trap focus within given container.
- */
-export const trapFocus = (container: Element): FocusTrapControls => {
+export const trapFocus = (container: Node, selector: string): FocusTrapControls => {
+    const focusElement = document.querySelector<HTMLElement>(selector);
+    if (!focusElement) throw new Error(`Cannot find focus element using selector ${selector}`);
+
     // all elements that are not related to specified container..
     const outsiders: Element[] = [];
     const defaultFocusables = [
@@ -131,9 +153,18 @@ export const trapFocus = (container: Element): FocusTrapControls => {
         })
     }
 
+    let prevFocusElement: HTMLButtonElement | null = null;
+
     return {
-        trap: () => outsiders.forEach(el => el.setAttribute('tabindex', '-1')),
-        untrap: () => outsiders.forEach(el => el.removeAttribute('tabindex'))
+        trap: () => {
+            prevFocusElement = document.activeElement as HTMLButtonElement;
+            outsiders.forEach(el => el.setAttribute('tabindex', '-1'));
+            focusElement.focus();
+        },
+        untrap: () => {
+            outsiders.forEach(el => el.removeAttribute('tabindex'));
+            if (prevFocusElement) prevFocusElement.focus();
+        }
     }
 }
 
@@ -169,13 +200,19 @@ export const setFlow = (dir: 'include' | 'exclude', ...elements: HTMLElement[]) 
     for (const element of elements) {
         addStylesTo(element, {
             position: dir === 'exclude' ? 'absolute' : 'relative',
+            pointerEvents: dir === 'exclude' ? 'none' : 'auto'
         });
     }
 }
 
-export const onClickOutsideOf = (elements: Element[], cb: (e: Event) => void) => {
-    window.addEventListener('click', (e: Event) => {
-        const target = e.target as Element;
+export interface ClickOutsideEventControls {
+    listen: () => void;
+    unlisten: () => void;
+}
+
+export const onClickOutsideOf = (elements: Node[], cb: (e: Event) => void): ClickOutsideEventControls => {
+    const eventListener = (e: Event) => {
+        const target = e.target as HTMLElement;
         if (!target) return;
 
         let isOutside = true;
@@ -184,5 +221,10 @@ export const onClickOutsideOf = (elements: Element[], cb: (e: Event) => void) =>
         }
 
         if (isOutside) cb.call({}, e);
-    }, { once: true });
+    };
+
+    return {
+        listen: () => window.addEventListener('click', eventListener),
+        unlisten: () => window.removeEventListener('click', eventListener)
+    }
 }

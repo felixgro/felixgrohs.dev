@@ -1,7 +1,7 @@
 import { createContainer } from './ProjectFactory';
 import { initProjectTooltip, displayProject } from './ProjectTooltip';
 import { toggleClientScrolling } from '../utils/gestures';
-import { catchFocusIn, addGradientCoverTo, scrollHorizontal } from '../utils/dom';
+import { catchFocusIn, addGradientCoverTo, scrollHorizontal, removeChildren } from '../utils/dom';
 import { on } from '../utils/events';
 
 
@@ -44,11 +44,19 @@ export const initProjectScroller = () => {
 	const gradientColor = getComputedStyle(document.querySelector('#app')!).backgroundColor;
 	addGradientCoverTo(parentContainer, gradientColor);
 
+	// disable all kind of default scroll behaviours and create tooltip for project preview..
+	toggleClientScrolling(scrollContainer, true).disable();
+	initProjectTooltip();
+
 	// listen for these events..
 	on('post-resize', () => {
 		scrollFrame = scrollContainer.getBoundingClientRect();
 		margin = innerWidth * marginFactor;
 		if (margin < marginMin) margin = marginMin;
+
+		// fill parent with projects and start scrolling!
+		generateProjects();
+		startScrolling();
 	}, { immediately: true });
 
 	on('visible', () => {
@@ -64,14 +72,6 @@ export const initProjectScroller = () => {
 		subContainers = document.querySelectorAll('.sub-container');
 		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLAnchorElement).click();
 	});
-
-	// disable all kind of default scroll behaviours and create tooltip for project preview..
-	toggleClientScrolling(scrollContainer, true).disable();
-	initProjectTooltip();
-
-	// fill parent with projects and start scrolling!
-	generateProjects();
-	startScrolling();
 }
 
 
@@ -202,6 +202,8 @@ const scrollAnimationFrame = () => {
  * subsequently center the scroll position horizontally to enable seamless client scrolling in both directions.
  */
 const generateProjects = () => {
+	removeChildren(scrollContainer);
+
 	let currentWidth = 0;
 
 	const generateProjectsContainer = (): HTMLDivElement => {

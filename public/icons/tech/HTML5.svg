@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 23 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-578.215,-207.836)">
+        <g id="Icon_HTML.afdesign" transform="matrix(0.359375,0,0,0.359375,589.715,219.336)">
+            <g transform="matrix(1,0,0,1,-32,-32)">
+                <clipPath id="_clip1">
+                    <rect x="0" y="0" width="64" height="64"/>
+                </clipPath>
+                <g clip-path="url(#_clip1)">
+                    <path d="M59.559,4.29C59.64,3.182 59.255,2.09 58.499,1.276C57.742,0.462 56.681,-0 55.569,-0C45.182,-0 18.818,-0 8.431,-0C7.319,-0 6.258,0.462 5.501,1.276C4.745,2.09 4.36,3.182 4.441,4.29C5.249,15.404 7.394,44.9 8.059,54.037C8.179,55.686 9.302,57.092 10.884,57.573C16.018,59.136 27.203,62.54 30.835,63.646C31.595,63.877 32.405,63.877 33.165,63.646C36.797,62.54 47.982,59.136 53.116,57.573C54.698,57.092 55.821,55.686 55.941,54.037C56.606,44.9 58.751,15.404 59.559,4.29ZM40.942,33.155L40.299,42.025L32.19,44.127L23.875,41.875L23.875,36.5L16.086,36.495L16.996,47.626L32,52.379L47,47.625L48.75,26.125L22.769,26.125L22.25,18.625L49.25,18.625L49.876,11.75L14.125,11.75L15.757,33.155L40.942,33.155Z" style="fill:rgb(252,73,11);"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

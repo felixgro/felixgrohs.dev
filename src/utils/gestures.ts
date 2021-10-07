@@ -1,23 +1,23 @@
 import { supportsPassive } from './browser';
 
-interface Position {
+export interface Position {
 	x: number;
 	y: number;
 }
 
-interface SwipeCallbacks {
+export interface SwipeCallbacks {
 	left?(e: TouchEvent): void;
 	right?(e: TouchEvent): void;
 	up?(e: TouchEvent): void;
 	down?(e: TouchEvent): void;
 }
 
-interface SwipeController {
+export interface SwipeController {
 	addListener(): SwipeController;
 	removeListener(): SwipeController;
 }
 
-export const swipeable = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeController => {
+export const swipe = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeController => {
 	let startPos: Position | null = null;
 
 	const handleTouchStart = (e: TouchEvent) => {
@@ -42,8 +42,8 @@ export const swipeable = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeCont
 
 	return {
 		addListener() {
-			el.addEventListener('touchstart', handleTouchStart);
-			el.addEventListener('touchmove', handleTouchMove);
+			el.addEventListener('touchstart', handleTouchStart, { passive: false });
+			el.addEventListener('touchmove', handleTouchMove, { passive: false });
 			return this;
 		},
 		removeListener() {
