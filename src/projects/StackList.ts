@@ -6,7 +6,7 @@ import { addStylesTo } from '../utils/css';
 // get all paths of svg icons located in public/icons/tech directory..
 const techIconPaths = import.meta.glob('/public/icons/tech/*.svg');
 
-export const createStackList = (): StackList => new StackList();
+export const createStackList = (el: HTMLElement): StackList => new StackList(el);
 
 interface StackIcon {
     title: string;
@@ -14,15 +14,15 @@ interface StackIcon {
 }
 
 export class StackList {
-    public element: HTMLDivElement;
+    public element: HTMLElement;
 
     private icons: StackIcon[] = [];
 
     private mainList: HTMLUListElement;
     private subList: HTMLUListElement;
 
-    constructor() {
-        this.element = document.createElement('div');
+    constructor(el: HTMLElement) {
+        this.element = el;
         addStylesTo(this.element, { position: 'relative' });
 
         this.icons = this.generateStackIcons();
@@ -30,11 +30,10 @@ export class StackList {
         this.mainList = document.createElement('ul');
         this.subList = document.createElement('ul');
         setFlow('exclude', this.subList);
+        setVisibility(false, this.subList);
         addStylesTo(this.subList, { top: 0 });
 
         appendChildren(this.element, this.mainList, this.subList);
-
-        this.element.setAttribute('aria-label', 'used technologies');
 
         for (const icon of this.icons) {
             this.mainList.appendChild(icon.img.cloneNode());
@@ -104,8 +103,6 @@ export class StackList {
             img.src = relPath;
             img.alt = `${title} Icon`;
             img.title = `${title}`; // shows title in browser tooltip on hover..
-
-            setVisibility(false, img, false);
 
             imgs.push({
                 img,

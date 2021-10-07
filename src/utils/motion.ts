@@ -1,4 +1,4 @@
-import { appendChildren, setVisibility, setFlow } from './dom';
+import { appendChildren, setVisibility, setFlow, wrap } from './dom';
 
 export interface AnimationConfig {
     direction: 'up' | 'down';
@@ -12,10 +12,10 @@ export interface SwappableText {
     heightDiff: (txt: string) => number;
 }
 
-export const swappable = (tag: string): SwappableText => {
+export const swappable = <T extends HTMLElement>(element: T): SwappableText => {
     const parent = document.createElement('div'),
-        primaryEl = document.createElement(tag),
-        secondaryEl = document.createElement(tag);
+        primaryEl = element,
+        secondaryEl = document.createElement(element.tagName);
 
     // make secondary element invisible for screenreaders
     // and exclude it from layout flow to calculate new height..
@@ -23,7 +23,11 @@ export const swappable = (tag: string): SwappableText => {
     setFlow('exclude', secondaryEl);
 
     // append both elements within parent..
-    appendChildren(parent, primaryEl, secondaryEl);
+    // appendChildren(parent, primaryEl, secondaryEl);
+
+    // Include parent for element and insert secondary element as well..
+    wrap(primaryEl, parent);
+    parent.appendChild(secondaryEl);
 
     return {
         parent,
