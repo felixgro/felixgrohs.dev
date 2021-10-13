@@ -1,17 +1,17 @@
-import { createContainer } from './ProjectFactory';
-import { initProjectTooltip, displayProject } from './ProjectTooltip';
+import { on } from '../utils/events';
 import { toggleClientScrolling } from '../utils/gestures';
 import { catchFocusIn, addGradientCoverTo, scrollHorizontal, removeChildren } from '../utils/dom';
-import { on } from '../utils/events';
+
+import { prepareDialog, displayProject } from './ProjectDialog';
+import { createContainer } from './ProjectFactory';
+
+type ScrollState = 'scrolling' | 'centering' | 'idling';
 
 
 const scrollSpeed = .9,
 	distanceFactor = 1.7, // distance multiplicator for appending/prepending on client interaction
 	marginFactor = 2, // gets multiplied with innerWidth for margin
 	marginMin = 800;
-
-
-type ScrollState = 'scrolling' | 'centering' | 'idling';
 
 
 let parentContainer: HTMLDivElement,
@@ -23,7 +23,7 @@ let parentContainer: HTMLDivElement,
 	subContainers: NodeListOf<Element>,
 	animationFrameId: number,
 	scrollState: ScrollState = 'idling',
-	margin: number, // min scroll distance in each direction
+	margin: number, // min scroll-overlap distance in each direction
 	scrolledDistance = 0, // tracks total distance on client interaction
 	currentScroll = 0; // current scroll position
 
@@ -31,47 +31,20 @@ let parentContainer: HTMLDivElement,
 /**
  * Initialize by filling parent container with all configured projects, assign variables and start auto scrolling.
  */
-export const initProjectScroller = () => {
+export const initProjectScroller = (app: Element) => {
 	parentContainer = document.querySelector('.projects-container')!;
+	scrollContainer = insertScrollerMarkup(parentContainer);
 
-	// create scroll container..
-	scrollContainer = document.createElement('div');
-	scrollContainer.setAttribute('class', 'projects no-scrollbar no-select');
-	scrollContainer.setAttribute('aria-hidden', 'true');
-	parentContainer.appendChild(scrollContainer);
+	// add horizontal gradient cover on top and register necessary events..
+	addGradientCoverTo(parentContainer, getComputedStyle(app).backgroundColor);
+	registerEvents();
 
-	// add gradient cover..
-	const gradientColor = getComputedStyle(document.querySelector('#app')!).backgroundColor;
-	addGradientCoverTo(parentContainer, gradientColor);
+	// disable all kind of default scroll behaviours..
+	toggleClientScrolling(scrollContainer, true)
+		.disable();
 
-	// disable all kind of default scroll behaviours and create tooltip for project preview..
-	toggleClientScrolling(scrollContainer, true).disable();
-	initProjectTooltip();
-
-	// listen for these events..
-	on('post-resize', () => {
-		scrollFrame = scrollContainer.getBoundingClientRect();
-		margin = innerWidth * marginFactor;
-		if (margin < marginMin) margin = marginMin;
-
-		// fill parent with projects and start scrolling!
-		generateProjects();
-		startScrolling();
-	}, { immediately: true });
-
-	on('visible', () => {
-		if (!currentProject) startScrolling();
-	});
-
-	on('invisible', () => {
-		stopScrolling();
-	});
-
-	// listen for tab-moved focus on scroll container..
-	catchFocusIn(parentContainer, 'Selection of Projects', () => {
-		subContainers = document.querySelectorAll('.sub-container');
-		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLAnchorElement).click();
-	});
+	// prepare dialog on next idle..
+	requestIdleCallback(() => prepareDialog(app));
 }
 
 
@@ -239,15 +212,15 @@ const centerProject = (projectElement: HTMLAnchorElement) => {
 
 	const bcr = projectElement.getBoundingClientRect(),
 		containerWidth = firstContainer.clientWidth,
-		rawDiff = (bcr.width / 2 + bcr.left) - (scrollFrame.width / 2 + scrollFrame.left);
+		diff = (bcr.width / 2 + bcr.left) - (scrollFrame.width / 2 + scrollFrame.left);
 
 	scrollHorizontal(scrollContainer, {
 		from: currentScroll,
-		to: rawDiff,
+		to: diff,
 		speed: scrollSpeed
 	}).then(() => {
-		currentScroll += rawDiff;
-		scrolledDistance += rawDiff;
+		currentScroll += diff;
+		scrolledDistance += diff;
 
 		// swap containers to create an illusion of 'infinite' scrolling..
 		for (let i = Math.abs(scrolledDistance) * distanceFactor; i > containerWidth; i -= containerWidth) {
@@ -264,3 +237,40 @@ const centerProject = (projectElement: HTMLAnchorElement) => {
 		scrollState = 'idling';
 	});
 };
+
+
+const insertScrollerMarkup = (parent: Element): HTMLDivElement => {
+	const scroller = document.createElement('div');
+	scroller.setAttribute('class', 'projects no-scrollbar no-select');
+	scroller.setAttribute('aria-hidden', 'true');
+	parent.appendChild(scroller);
+	return scroller;
+}
+
+
+const registerEvents = () => {
+	// listen for these events..
+	on('post-resize', () => {
+		scrollFrame = scrollContainer.getBoundingClientRect();
+		margin = innerWidth * marginFactor;
+		if (margin < marginMin) margin = marginMin;
+
+		// fill parent with projects and start scrolling!
+		generateProjects();
+		startScrolling();
+	}, { immediately: true });
+
+	on('visible', () => {
+		if (!currentProject) startScrolling();
+	});
+
+	on('invisible', () => {
+		stopScrolling();
+	});
+
+	// listen for tab-moved focus on scroll container..
+	catchFocusIn(parentContainer, 'Selection of Projects', () => {
+		subContainers = document.querySelectorAll('.sub-container');
+		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLAnchorElement).click();
+	});
+}

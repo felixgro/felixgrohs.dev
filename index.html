@@ -11,6 +11,7 @@
 
 	<link rel="preload" href="./src/assets/fonts/Lato-Regular.ttf" as="font" type="font/ttf" crossorigin>
 	<link rel="preload" href="./src/assets/fonts/Lato-Bold.ttf" as="font" type="font/ttf" crossorigin>
+	<link rel="stylesheet" href="./src/assets/styles/async.css" media="print" onload="this.media='all'">
 	<link rel="stylesheet" href="./src/assets/styles/main.css">
 
 	<title>Felix Grohs - Fullstack Webdeveloper - felixgrohs.dev</title>
@@ -63,8 +64,15 @@
 			</noscript>
 		</aside>
 
-		<div class="project-tooltip" role="dialog" aria-hidden="true" aria-labelledby="projectTitle"
-			aria-describedby="projectDescription">
+		<footer class="grid-cell">
+		</footer>
+
+		<canvas aria-label="Animated Grid Lines" class="animated-grid"></canvas>
+	</div>
+
+	<template id="DialogTemplate">
+		<div id="projectDialog" role="dialog" aria-labelledby="projectTitle" aria-describedby="projectDescription"
+			aria-hidden="true">
 			<header>
 				<h3 id="projectTitle" tabindex="-1"></h3>
 				<div class="stacklist" aria-label="Used technologies"></div>
@@ -73,11 +81,20 @@
 			<p id="projectDescription"></p>
 
 			<footer>
-				<form>
-					<button aria-label="Quit projects dialog" class="tooltip-action-escape">Escape</button>
-					<button aria-label="Goto previous project" class="tooltip-action-previous">Previous</button>
-					<button aria-label="Goto next project" class="tooltip-action-next">Next</button>
-				</form>
+				<nav class="controls" aria-controls="projectDialog">
+					<button aria-label="exit project dialog">
+						<span>exit</span>
+						<img src="./icons/Action_Exit.svg" alt="Exit Symbol" height="14" width="14">
+					</button>
+					<button aria-label="return to previous project">
+						<span>back</span>
+						<img src="./icons/Action_Previous.svg" alt="Previous Symbol" height="14" width="14">
+					</button>
+					<button aria-label="goto next project">
+						<span>next</span>
+						<img src="./icons/Action_Next.svg" alt="Next Symbol" height="14" width="14">
+					</button>
+				</nav>
 				<nav>
 					<a href="#" class="source">Source</a>
 					<a href="#" class="preview">Preview</a>
@@ -86,12 +103,7 @@
 
 			<div class="triangle-down"></div>
 		</div>
-
-		<footer class="grid-cell">
-		</footer>
-
-		<canvas aria-label="Animated Grid Lines" class="animated-grid"></canvas>
-	</div>
+	</template>
 </body>
 
 </html>

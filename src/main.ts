@@ -5,8 +5,9 @@ import animateGrid from './utils/grid';
 registerDefaultEvents();
 
 on('load', () => {
+    const appContainer = document.querySelector('#app')!;
     // Start scrolling through projects
-    initProjectScroller();
+    initProjectScroller(appContainer);
 
     // Draw Grid..
     const gridCanvas = document.querySelector('.animated-grid') as HTMLCanvasElement;
