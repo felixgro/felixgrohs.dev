@@ -165,7 +165,7 @@ footer.grid-cell {
 	max-width: 580px;
 	left: 50%;
 	transform: translateX(-50%);
-	border-radius: 28px;
+	border-radius: 11px;
 	transform-origin: bottom center;
 	background: var(--tooltip-bg);
 	box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.05);
@@ -223,7 +223,41 @@ footer.grid-cell {
 		z-index: 1;
 
 		/* Actions */
-		& form {
+		& nav.controls {
+			& button {
+				margin-right: 2px;
+				height: 36px;
+				width: 40px;
+				border-radius: 8px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+
+				& img {
+					transition: all 140ms ease-out;
+				}
+
+				& span {
+					position: absolute;
+					font-size: 0.85rem;
+					font-weight: 600;
+					color: hsl(240, 13%, 22%);
+					transform: translateY(12px);
+					opacity: 0;
+					transition: all 140ms ease-out;
+				}
+
+				&:focus {
+					outline-width: 3px;
+					& span {
+						opacity: 1;
+						transform: translateY(6px);
+					}
+					& img {
+						transform: translateY(-6px) scale(0.65);
+					}
+				}
+			}
 		}
 
 		& nav {
@@ -243,7 +277,7 @@ footer.grid-cell {
 				&.preview {
 					background: var(--tooltip-preview-bg);
 					color: var(--tooltip-preview);
-					border-radius: 4px 4px 16px 4px;
+					border-radius: 6px 6px 6px 6px;
 					margin-left: 8px;
 					padding: clamp(3px, 3vw, 8px) clamp(7px, 3vw, 12px);
 
