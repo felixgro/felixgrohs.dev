@@ -2,7 +2,7 @@ import type { StackList } from './StackList';
 import type { Project } from './ProjectFactory';
 import type { SwipeController } from '../utils/gestures';
 import type { SwappableText, AnimationConfig } from '../utils/motion';
-import type { FocusTrapControls, ClickOutsideEventControls } from '../utils/dom';
+import type { FocusTrapControls, ClickOutsideControls } from '../utils/dom';
 
 import { on } from '../utils/events';
 import { swipe } from '../utils/gestures';
@@ -10,7 +10,7 @@ import { swappable } from '../utils/motion';
 import { createStackList } from './StackList';
 import { getProject } from './ProjectFactory';
 import { startScrolling, getNeighbor } from './ProjectScroller';
-import { trapFocus, setVisibility, onClickOutsideOf } from '../utils/dom';
+import { trapFocus, setVisibility, onClickOutside } from '../utils/dom';
 
 
 const ANIM_DURATION = 200, // Duration of text swap & dialog height animation
@@ -28,7 +28,7 @@ let dialog: HTMLElement,
     controls: NodeListOf<HTMLButtonElement>,
     focusTrap: FocusTrapControls,
     swipeCntrl: SwipeController,
-    clickOutsideHandler: ClickOutsideEventControls,
+    clickOutsideListener: ClickOutsideControls,
     isOpen = false;
 
 
@@ -43,8 +43,13 @@ export const prepareDialog = (app: Element) => {
 
     controls = app.querySelectorAll('button')!;
     scrollContainer = app.querySelector('.projects-container')!;
-    clickOutsideHandler = onClickOutsideOf([dialog, scrollContainer], closeDialog);
     focusTrap = trapFocus(dialog, '#projectTitle');
+    clickOutsideListener = onClickOutside({
+        elements: [dialog, scrollContainer],
+        callback: closeDialog,
+        within: app,
+    });
+
     registerEvents();
 }
 
@@ -86,7 +91,7 @@ export const openDialog = () => {
         duration: ANIM_DURATION,
         fill: 'forwards',
     }).addEventListener('finish', () => {
-        clickOutsideHandler.listen();
+        clickOutsideListener.activate();
         swipeCntrl.addListener();
         focusTrap.trap();
     });
@@ -116,7 +121,7 @@ export const closeDialog = () => {
         setVisibility(false, dialog);
         swipeCntrl.removeListener();
         focusTrap.untrap();
-        clickOutsideHandler.unlisten();
+        clickOutsideListener.deactivate();
     });
 
     startScrolling();

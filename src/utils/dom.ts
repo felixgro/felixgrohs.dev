@@ -205,26 +205,39 @@ export const setFlow = (dir: 'include' | 'exclude', ...elements: HTMLElement[]) 
     }
 }
 
-export interface ClickOutsideEventControls {
-    listen: () => void;
-    unlisten: () => void;
+export interface ClickOutsideParams {
+    elements: Node[],
+    callback: (e: Event) => void;
+    within?: Node;
 }
 
-export const onClickOutsideOf = (elements: Node[], cb: (e: Event) => void): ClickOutsideEventControls => {
-    const eventListener = (e: Event) => {
-        const target = e.target as HTMLElement;
-        if (!target) return;
+export interface ClickOutsideControls {
+    activate: CallableFunction;
+    deactivate: CallableFunction;
+}
 
-        let isOutside = true;
-        for (let i = 0; i < elements.length; i++) {
-            if (hasParent(elements[i], target)) isOutside = false;
-        }
+export const onClickOutside = (options: ClickOutsideParams): ClickOutsideControls => {
+    const clickableLayer = document.createElement('div');
+    let minZ = Infinity;
 
-        if (isOutside) cb.call({}, e);
-    };
+    for (const el of options.elements) {
+        const z = parseInt(getComputedStyle(el as HTMLElement).zIndex);
+        if (z < minZ) minZ = z - 1;
+    }
+
+    clickableLayer.addEventListener('click', options.callback);
+    addStylesTo(clickableLayer, {
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        inset: 0,
+        zIndex: -1,
+    });
+
+    (options.within ? options.within : document).appendChild(clickableLayer);
 
     return {
-        listen: () => window.addEventListener('click', eventListener),
-        unlisten: () => window.removeEventListener('click', eventListener)
+        activate: () => addStylesTo(clickableLayer, { zIndex: minZ }),
+        deactivate: () => addStylesTo(clickableLayer, { zIndex: -1 })
     }
 }
