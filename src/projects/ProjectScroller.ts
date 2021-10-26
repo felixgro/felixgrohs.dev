@@ -43,8 +43,9 @@ export const initProjectScroller = (app: Element) => {
 	toggleClientScrolling(scrollContainer, true)
 		.disable();
 
-	// prepare dialog on next idle..
-	requestIdleCallback(() => prepareDialog(app));
+	// TODO: prepare dialog when idling..
+	// window.requestIdleCallback(() => prepareDialog(app));
+	prepareDialog(app);
 }
 
 
