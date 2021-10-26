@@ -13,7 +13,7 @@
 	z-index: 200;
 
 	--vertical-padding: 30px;
-	--footer-height: 51px;
+	--footer-height: 55px;
 
 	& header {
 		display: flex;
@@ -63,12 +63,14 @@
 		background: var(--tooltip-footer-bg);
 		z-index: 1;
 
+		--btn-height: 36px;
+
 		/* Actions */
 		& nav.controls {
 			& button {
 				margin-right: 2px;
-				height: 36px;
-				width: 40px;
+				height: var(--btn-height);
+				width: 36px;
 				border-radius: 8px;
 				display: flex;
 				justify-content: center;
@@ -112,6 +114,9 @@
 				padding: 6px 12px;
 				transition: color 120ms ease-out;
 				overflow: hidden;
+				height: var(--btn-height);
+				display: flex;
+				align-items: center;
 
 				border-radius: 4px;
 
@@ -121,6 +126,7 @@
 					border-radius: 6px 6px 6px 6px;
 					margin-left: 8px;
 					padding: clamp(3px, 3vw, 8px) clamp(7px, 3vw, 12px);
+					text-decoration: none;
 
 					& svg {
 						margin-right: 2px;

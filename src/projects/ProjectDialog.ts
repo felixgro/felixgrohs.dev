@@ -9,11 +9,13 @@ import { swipe } from '../utils/gestures';
 import { swappable } from '../utils/motion';
 import { createStackList } from './StackList';
 import { getProject } from './ProjectFactory';
-import { startScrolling, getNeighbor } from './ProjectScroller';
+import { debounce } from '../utils/functions';
 import { trapFocus, setVisibility, onClickOutside } from '../utils/dom';
+import { startScrolling, getNeighbor } from './ProjectScroller';
 
 
-const ANIM_DURATION = 200, // Duration of text swap & dialog height animation
+const DEBOUNCE_TIMEOUT = 240,
+    ANIM_DURATION = 200, // Duration of text swap & dialog height animation
     ANIM_DISTANCE = 20; // Distance of vertical text swap animation
 
 
@@ -260,9 +262,9 @@ const registerEvents = () => {
     // TODO: Inform screenreaders of keyboard shortcuts
     // https://www.w3schools.com/tags/att_global_accesskey.asp
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/ariaKeyShortcuts
-    on('key-Right', gotoNext);
-    on('key-Left', gotoPrevious);
-    on('key-Escape', closeDialog);
+    on('key-Right', debounce(gotoNext, { timeout: DEBOUNCE_TIMEOUT }));
+    on('key-Left', debounce(gotoPrevious, { timeout: DEBOUNCE_TIMEOUT }));
+    on('key-Escape', debounce(closeDialog, { timeout: DEBOUNCE_TIMEOUT }));
 
-    controls.forEach(c => c.addEventListener('click', actionEventListener));
+    controls.forEach(c => c.addEventListener('click', debounce(actionEventListener, { timeout: DEBOUNCE_TIMEOUT })));
 }
