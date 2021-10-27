@@ -21,8 +21,12 @@
 		padding: 32px var(--vertical-padding);
 		color: var(--tooltip-header);
 
-		& h3:focus {
-			outline: none;
+		& h3 {
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			&:focus {
+				outline: none;
+			}
 		}
 
 		/* Stack */
