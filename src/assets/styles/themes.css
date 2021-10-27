@@ -6,11 +6,12 @@ body {
 			hsl(270, 90%, 60%) 100%
 		);
 
+		--focus-marker: purple;
+
 		--main-1: hsl(264, 90%, 60%);
 		--gray-1: hsl(240, 13%, 11%);
 		--gray-2: hsl(240, 14%, 12%);
 		--gray-3: hsl(240, 13%, 15%);
-
 		--gray-4: hsl(240, 11%, 18%);
 		--gray-5: hsl(240, 12%, 43%);
 		--gray-6: hsl(240, 12%, 49%);
@@ -42,18 +43,18 @@ body {
 	--scroller-project-active: var(--gray-9);
 	--scroller-project-active-bg: var(--gray-3);
 
-	/* Project Tooltip */
-	--tooltip-bg: var(--gray-3);
-	--tooltip-header: var(--gray-5);
-	--tooltip-body: var(--gray-8);
-	--tooltip-actions: var(--gray-5);
-	--tooltip-actions-hover: var(--gray-8);
-	--tooltip-source: var(--gray-6);
-	--tooltip-preview: var(--gray-9);
-	--tooltip-preview-icon: var(--gray-8);
-	--tooltip-preview-bg: var(--main-1);
-	--tooltip-footer-bg: var(--gray-3);
-	--tooltip-footer-border: var(--gray-4);
+	/* Project Dialog */
+	--dialog-bg: var(--gray-3);
+	--dialog-header: var(--gray-8);
+	--dialog-body: var(--gray-7);
+	--dialog-actions: var(--gray-5);
+	--dialog-actions-hover: var(--gray-8);
+	--dialog-source: var(--gray-6);
+	--dialog-preview: var(--gray-9);
+	--dialog-preview-icon: var(--gray-8);
+	--dialog-preview-bg: var(--main-1);
+	--dialog-footer-bg: var(--gray-3);
+	--dialog-footer-border: var(--gray-4);
 
 	/* Footer */
 	--footer-txt: var(--gray-4);

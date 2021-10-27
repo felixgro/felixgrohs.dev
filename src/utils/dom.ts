@@ -53,13 +53,14 @@ export const removeChildren = (parent: Node) => {
 export const catchFocusIn = (parent: Node, label: string, eventCallback: (e: Event) => void): HTMLButtonElement => {
     const catchElement = document.createElement('button');
     catchElement.innerText = label;
+
     addStylesTo(catchElement, {
-        position: 'relative',
-        overflow: 'hidden',
-        opacity: 0,
-        height: 0,
-        width: 0,
-    });
+        position: 'absolute',
+        height: '90%',
+        width: '90%',
+        pointerEvents: 'none',
+        color: 'rgba(0,0,0,0)'
+    })
 
     catchElement.addEventListener('click', eventCallback);
     return parent.appendChild(catchElement);

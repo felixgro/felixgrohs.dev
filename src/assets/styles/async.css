@@ -1,13 +1,13 @@
 #projectDialog {
 	display: none;
 	position: absolute;
-	width: 80%;
+	width: 95%;
 	max-width: 580px;
 	left: 50%;
 	transform: translateX(-50%);
 	border-radius: 11px;
 	transform-origin: bottom center;
-	background: var(--tooltip-bg);
+	background: var(--dialog-bg);
 	box-shadow: 2px 2px 8px 0 rgba(0, 0, 0, 0.05);
 	z-index: 200;
 
@@ -19,11 +19,13 @@
 		align-items: center;
 		justify-content: space-between;
 		padding: 32px var(--vertical-padding);
-		color: var(--tooltip-header);
+		color: var(--dialog-header);
 
 		& h3 {
 			white-space: nowrap;
 			text-overflow: ellipsis;
+			max-width: 200px;
+			overflow: hidden;
 			&:focus {
 				outline: none;
 			}
@@ -45,7 +47,7 @@
 
 	& p {
 		position: relative;
-		color: var(--tooltip-body);
+		color: var(--dialog-body);
 		margin-bottom: calc(var(--footer-height) * 1.05);
 		padding: 0 var(--vertical-padding) 40px var(--vertical-padding);
 	}
@@ -62,11 +64,11 @@
 		border-radius: inherit;
 		border-top-left-radius: 0;
 		border-top-right-radius: 0;
-		border-top: 1px solid var(--tooltip-footer-border);
-		background: var(--tooltip-footer-bg);
+		border-top: 1px solid var(--dialog-footer-border);
+		background: var(--dialog-footer-bg);
 		z-index: 1;
 
-		--btn-height: 36px;
+		--btn-height: 30px;
 
 		/* Actions */
 		& nav.controls {
@@ -74,13 +76,13 @@
 				margin-right: 2px;
 				height: var(--btn-height);
 				width: 36px;
-				border-radius: 8px;
 				display: flex;
 				justify-content: center;
 				align-items: center;
 
 				& img {
 					transition: all 140ms ease-out;
+					opacity: 0.4;
 				}
 
 				& span {
@@ -93,14 +95,19 @@
 					transition: all 140ms ease-out;
 				}
 
-				&:focus {
-					outline-width: 3px;
+				&.focus-visible:focus {
 					& span {
 						opacity: 1;
 						transform: translateY(6px);
 					}
 					& img {
 						transform: translateY(-6px) scale(0.65);
+					}
+				}
+
+				@media (hover: hover) and (pointer: fine) {
+					&:hover img {
+						opacity: 1;
 					}
 				}
 			}
@@ -112,7 +119,7 @@
 			flex-wrap: nowrap;
 
 			& a {
-				color: var(--tooltip-source);
+				color: var(--dialog-source);
 				font-size: 14px;
 				padding: 6px 12px;
 				transition: color 120ms ease-out;
@@ -124,8 +131,8 @@
 				border-radius: 4px;
 
 				&.preview {
-					background: var(--tooltip-preview-bg);
-					color: var(--tooltip-preview);
+					background: var(--dialog-preview-bg);
+					color: var(--dialog-preview);
 					border-radius: 6px 6px 6px 6px;
 					margin-left: 8px;
 					padding: clamp(3px, 3vw, 8px) clamp(7px, 3vw, 12px);
@@ -134,7 +141,7 @@
 					& svg {
 						margin-right: 2px;
 						& polygon {
-							fill: var(--tooltip-preview-icon);
+							fill: var(--dialog-preview-icon);
 							transition: fill 120ms ease-out;
 						}
 					}
@@ -152,6 +159,6 @@
 		transform: translateX(-50%);
 		border-left: 16px solid transparent;
 		border-right: 16px solid transparent;
-		border-top: 20px solid var(--tooltip-footer-bg);
+		border-top: 20px solid var(--dialog-footer-bg);
 	}
 }

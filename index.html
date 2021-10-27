@@ -7,14 +7,13 @@
 	<meta name="description"
 		content="I'm a certified fullstack Webdeveloper with a passion for creating clean and accessible user interfaces as well as motion design for the modern web.">
 
-	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+	<title>Felix Grohs - Fullstack Webdeveloper - felixgrohs.dev</title>
 
 	<link rel="preload" href="./src/assets/fonts/Lato-Regular.ttf" as="font" type="font/ttf" crossorigin>
 	<link rel="preload" href="./src/assets/fonts/Lato-Bold.ttf" as="font" type="font/ttf" crossorigin>
 	<link rel="stylesheet" href="./src/assets/styles/async.css" media="print" onload="this.media='all'">
 	<link rel="stylesheet" href="./src/assets/styles/main.css">
-
-	<title>Felix Grohs - Fullstack Webdeveloper - felixgrohs.dev</title>
+	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
 	<script defer type="module" src="/src/main.ts"></script>
 </head>
@@ -50,12 +49,12 @@
 				</p>
 				<p class="intro">
 					Visit me on <a href="https://github.com/felixgro">Github</a> or <a
-						href="https://github.com/felixgro">Behance</a>.
+						href="https://github.com/felixgro">Behance</a>
 				</p>
 			</article>
 		</main>
 
-		<aside class="projects-container grid-cell">
+		<aside class="projects-container grid-cell" aria-label="selection of projects">
 			<noscript>
 				<span>
 					Visit me on <a href="https://github.com/felixgro">Github</a> for a selection of my
@@ -97,14 +96,21 @@
 					</button>
 				</nav>
 				<nav>
-					<a href="#" class="source">Source</a>
-					<a href="#" class="preview">Preview</a>
+					<a href="#" class="source" target="_blank">Source</a>
+					<a href="#" class="preview" target="_blank">Preview</a>
 				</nav>
 			</footer>
 
 			<div class="triangle-down"></div>
 		</div>
 	</template>
+
+	<!--
+		:focus-visible pseudo class polyfill due to no native support in safari.
+		More information about current browser support:
+		https://caniuse.com/?search=%3Afocus-visible
+	-->
+	<script src="/node_modules/focus-visible/dist/focus-visible.min.js"></script>
 </body>
 
 </html>

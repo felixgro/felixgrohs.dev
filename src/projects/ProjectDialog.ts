@@ -154,12 +154,12 @@ export const gotoPrevious = () => {
 
 /**
  * Assign new project to dialog. By default this happens immediately.
- * If boolean parameter animate is true, new contents will smoothly animate
+ * If animate is true, new contents will smoothly animate
  * to it's new state using the provided direction.
  */
 const assign = (project: Project, animate = false, direction: 'up' | 'down' = 'up') => {
     source.href = project.repo;
-    preview.href = project.url;
+    preview.href = project.url || project.repo;
 
     const animationConfig: AnimationConfig = {
         distance: ANIM_DISTANCE,
@@ -256,7 +256,7 @@ const registerEvents = () => {
     on('post-resize', () => {
         closeDialog();
         scrollBcr = scrollContainer.getBoundingClientRect();
-        dialog.style.bottom = `${scrollBcr.height * 2}px`;
+        dialog.style.bottom = `${scrollBcr.height + 50}px`;
     }, { immediately: true });
 
     // TODO: Inform screenreaders of keyboard shortcuts

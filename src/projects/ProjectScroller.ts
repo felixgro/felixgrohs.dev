@@ -43,7 +43,7 @@ export const initProjectScroller = (app: Element) => {
 	toggleClientScrolling(scrollContainer, true)
 		.disable();
 
-	// TODO: prepare dialog when idling..
+	// TODO: prepare dialog when idling for perf optimizations..
 	// window.requestIdleCallback(() => prepareDialog(app));
 	prepareDialog(app);
 }
@@ -258,7 +258,7 @@ const registerEvents = () => {
 
 		// fill parent with projects and start scrolling!
 		generateProjects();
-		// startScrolling();
+		startScrolling();
 	}, { immediately: true });
 
 	on('visible', () => {
@@ -270,7 +270,7 @@ const registerEvents = () => {
 	});
 
 	// listen for tab-moved focus on scroll container..
-	catchFocusIn(parentContainer, 'Selection of Projects', () => {
+	catchFocusIn(parentContainer, 'show first project', () => {
 		subContainers = document.querySelectorAll('.sub-container');
 		(subContainers[Math.floor((subContainers.length - 1) / 2)].children[0] as HTMLAnchorElement).click();
 	});

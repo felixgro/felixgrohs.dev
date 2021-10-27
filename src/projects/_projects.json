@@ -1,23 +1,21 @@
 [
 	{
 		"title": "animate-canvas",
-		"url": "https://github.com/felixgro/canvas-animator",
 		"repo": "https://github.com/felixgro/canvas-animator",
 		"description": "A minimal utility class for frame-independent Canvas2D animations.",
 		"stack": ["HTML5", "TS"]
 	},
 	{
 		"title": "vec2",
-		"url": "https://github.com/felixgro/vec2",
 		"repo": "https://github.com/felixgro/vec2",
-		"description": "An intuitive, lightweight 2d vector library with built-in canvas support.",
+		"description": "An intuitive, lightweight 2d vector library with built-in canvas2d rendering support for better visual debugging.",
 		"stack": ["HTML5", "TS"]
 	},
 	{
 		"title": "boids-simulation",
-		"url": "https://boids-simulation.vercel.app/",
+		"url": "https://felixgro.github.io/boids-simulation/",
 		"repo": "https://github.com/felixgro/boids-simulation",
-		"description": "Implementation of Craig Reynold's Boids Algorithm featuring reproduction & predetors along with an instinctive UI to tweak relevant proterties.",
+		"description": "Implementation of Craig Raynold’s boids algorithm with additional options to visualize all applied forces.",
 		"stack": ["HTML5", "TS"]
 	},
 	{
@@ -25,13 +23,18 @@
 		"url": "https://fractal-visualizer.netlify.app/",
 		"repo": "https://github.com/felixgro/fractal-visualizer",
 		"description": "This project demonstrates an artistic side of math by generating and redrawing fractals based on user defined variables.",
-		"stack": ["Vue", "JS", "HTML5", "CSS3"]
+		"stack": ["Vue", "JS", "HTML5"]
 	},
 	{
 		"title": "custcur",
-		"url": "https://github.com/felixgro/custcur",
 		"repo": "https://github.com/felixgro/custcur",
 		"description": "A lightweight, highly customizable cursor event framework for the web.",
 		"stack": ["JS", "HTML5"]
+	},
+	{
+		"title": "bora-cli",
+		"repo": "https://github.com/felixgro/bora-cli",
+		"description": "Easy-to-use cli tool for comparing execution durations of various methods in a node environment.",
+		"stack": ["JS"]
 	}
 ]
