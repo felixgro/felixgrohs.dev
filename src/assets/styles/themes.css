@@ -20,6 +20,7 @@ body {
 	}
 
 	&.light {
+		/* tba */
 	}
 
 	/* Generals */
@@ -55,6 +56,5 @@ body {
 	--tooltip-footer-border: var(--gray-4);
 
 	/* Footer */
-	--footer-socials: var(--gray-4);
-	--footer-socials-hover: var(--main-1);
+	--footer-txt: var(--gray-4);
 }

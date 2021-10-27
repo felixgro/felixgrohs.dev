@@ -258,7 +258,7 @@ const registerEvents = () => {
 
 		// fill parent with projects and start scrolling!
 		generateProjects();
-		startScrolling();
+		// startScrolling();
 	}, { immediately: true });
 
 	on('visible', () => {

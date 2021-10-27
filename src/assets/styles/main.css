@@ -4,8 +4,12 @@
 @import "./typography";
 
 body {
-	padding: clamp(10px, 3vw, 180px);
 	background: var(--bg-body);
+	padding: 5px;
+
+	@media screen and (min-width: 550px) {
+		padding: clamp(4px, 3vw, 180px);
+	}
 }
 
 #app {
@@ -78,35 +82,6 @@ header.grid-cell {
 	}
 }
 
-/* Main Footer */
-footer.grid-cell {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0 5px;
-
-	& nav ul {
-		display: flex;
-		align-items: center;
-		margin-right: -7px;
-
-		& a {
-			padding: 10px 7px;
-
-			& svg path {
-				fill: var(--footer-socials);
-				transition: fill 120ms ease-out;
-			}
-
-			@media (hover: hover) and (pointer: fine) {
-				&:hover svg path {
-					fill: var(--footer-socials-hover);
-				}
-			}
-		}
-	}
-}
-
 /* Main Project Scroller */
 .projects-container {
 	position: relative;
@@ -155,4 +130,12 @@ footer.grid-cell {
 			}
 		}
 	}
+}
+
+footer.grid-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.6rem;
+	color: var(--footer-txt);
 }

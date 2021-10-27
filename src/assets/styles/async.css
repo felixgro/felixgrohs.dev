@@ -1,8 +1,7 @@
-/* Project Tooltip */
 #projectDialog {
 	display: none;
 	position: absolute;
-	width: 85%;
+	width: 80%;
 	max-width: 580px;
 	left: 50%;
 	transform: translateX(-50%);
