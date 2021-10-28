@@ -26,6 +26,7 @@ export const swipe = (el: HTMLElement, callbacks: SwipeCallbacks): SwipeControll
 
 	const handleTouchMove = (e: TouchEvent) => {
 		if (!startPos) return;
+		e.preventDefault();
 		const diff: Position = {
 			x: startPos.x - e.touches[0].clientX,
 			y: startPos.y - e.touches[0].clientY

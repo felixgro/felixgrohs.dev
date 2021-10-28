@@ -1,3 +1,8 @@
+/*
+	This stylesheets get's loaded asynchronous, because it's not
+	needed in first page render and only relevant when first click
+	on a project occurs.
+*/
 #projectDialog {
 	display: none;
 	position: absolute;
@@ -23,9 +28,9 @@
 
 		& h3 {
 			white-space: nowrap;
-			text-overflow: ellipsis;
+			/* text-overflow: ellipsis;
 			max-width: 200px;
-			overflow: hidden;
+			overflow: hidden; */
 			&:focus {
 				outline: none;
 			}

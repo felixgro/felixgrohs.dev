@@ -10,9 +10,8 @@ type ScrollState = 'scrolling' | 'centering' | 'idling';
 
 const scrollSpeed = .9,
 	distanceFactor = 1.7, // distance multiplicator for appending/prepending on client interaction
-	marginFactor = 2, // gets multiplied with innerWidth for margin
-	marginMin = 800;
-
+	marginFactor = 3, // gets multiplied with innerWidth to get margin
+	marginMin = 800; // min margin required (for small screens)
 
 let parentContainer: HTMLDivElement,
 	currentProject: HTMLAnchorElement | null,
@@ -43,7 +42,7 @@ export const initProjectScroller = (app: Element) => {
 	toggleClientScrolling(scrollContainer, true)
 		.disable();
 
-	// TODO: prepare dialog when idling for perf optimizations..
+	// TODO: prepare dialog only when idling (method below is currently not supported in safari)
 	// window.requestIdleCallback(() => prepareDialog(app));
 	prepareDialog(app);
 }
@@ -166,7 +165,7 @@ const scrollAnimationFrame = () => {
 	scrollContainer.scrollLeft = currentScroll;
 
 	const lastBcr = lastContainer.getBoundingClientRect();
-	if (lastBcr.x + lastBcr.width < currentScroll + margin * 0.2)
+	if (lastBcr.x + lastBcr.width < currentScroll + margin * .2)
 		appendContainer();
 }
 

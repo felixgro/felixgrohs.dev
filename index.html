@@ -11,8 +11,8 @@
 
 	<link rel="preload" href="./src/assets/fonts/Lato-Regular.ttf" as="font" type="font/ttf" crossorigin>
 	<link rel="preload" href="./src/assets/fonts/Lato-Bold.ttf" as="font" type="font/ttf" crossorigin>
-	<link rel="stylesheet" href="./src/assets/styles/async.css" media="print" onload="this.media='all'">
-	<link rel="stylesheet" href="./src/assets/styles/main.css">
+	<link rel="stylesheet" href="./src/assets/css/dialog.css" media="print" onload="this.media='all'">
+	<link rel="stylesheet" href="./src/assets/css/main.css">
 	<link rel="icon" type="image/svg+xml" href="favicon.svg" />
 
 	<script defer type="module" src="/src/main.ts"></script>
@@ -105,11 +105,7 @@
 		</div>
 	</template>
 
-	<!--
-		:focus-visible pseudo class polyfill due to no native support in safari.
-		More information about current browser support:
-		https://caniuse.com/?search=%3Afocus-visible
-	-->
+	<!-- :focus-visible pseudo class polyfill due to no native support in safari -->
 	<script src="/node_modules/focus-visible/dist/focus-visible.min.js"></script>
 </body>
 
