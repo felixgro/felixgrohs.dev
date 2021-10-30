@@ -2,6 +2,9 @@ import { registerDefaultEvents, on } from './utils/events';
 import { initProjectScroller } from './projects/ProjectScroller';
 import animateGrid from './utils/grid';
 
+// :focus-visible pseudo class polyfill due to no native support in safari
+import 'focus-visible';
+
 registerDefaultEvents();
 
 on('load', () => {
